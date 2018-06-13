@@ -198,7 +198,7 @@ class Header extends Component {
                   <LinkContainer to={{
                       pathname: "/dashboard",
                       state: {
-                        user
+                        admin: user
                       },
                     }}
                   >

@@ -255,7 +255,7 @@ class ReviewsList extends Component {
           >
             <DialogTitle id="review-dialog-title">
               <Link to={{
-                  pathname: "/admin/user/" + this.state.username,
+                  pathname: "/user/s/" + this.state.username,
                   hash: '#',
                   state: {
                     "admin": this.props.admin,

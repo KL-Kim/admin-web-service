@@ -7,7 +7,6 @@ import configureStore from './stores/store';
 
 // Private Route Components
 import AdminRoute from './helpers/AdminRoute';
-import ManagerRoute from './helpers/ManagerRoute';
 
 // React Compontens
 import HomePage from './components/HomePage';
@@ -22,6 +21,7 @@ import ReviewsList from './components/ReviewsList';
 import PostsList from './components/PostsList';
 import CommentsList from './components/CommentsList';
 import UsersList from './components/UsersList';
+import SingleUserPage from './components/SingleUserPage';
 import NotificationPage from './components/NotificationPage'
 
 import { loadFromStorage } from './helpers/webStorage';
@@ -46,16 +46,16 @@ const App = () => {
           <Route exact path="/" component={HomePage} />
           <Route exact path="/signin" component={SigninPage} />
           <Route path="/notification" component={NotificationPage} />
-          <ManagerRoute exact path="/dashboard" component={DashboardPage} />
-          <ManagerRoute exact path="/business" component={BusinessListPage} />
-          <ManagerRoute path="/business/s/:id" component={SingleBusinessPage} />
-          <ManagerRoute path="/category" component={CategoriesList} />
-          <ManagerRoute path="/tag" component={TagsList} />
-          <ManagerRoute path="/review" component={ReviewsList} />
-          <ManagerRoute path="/post" component={PostsList} />
-          <ManagerRoute path="/comment" component={CommentsList} />
-          <AdminRoute path="/user" component={UsersList} />
-
+          <AdminRoute exact path="/dashboard" component={DashboardPage} />
+          <AdminRoute exact path="/business" component={BusinessListPage} />
+          <AdminRoute path="/business/s/:id" component={SingleBusinessPage} />
+          <AdminRoute path="/category" component={CategoriesList} />
+          <AdminRoute path="/tag" component={TagsList} />
+          <AdminRoute path="/review" component={ReviewsList} />
+          <AdminRoute path="/post" component={PostsList} />
+          <AdminRoute path="/comment" component={CommentsList} />
+          <AdminRoute exact path="/user" component={UsersList} />
+          <AdminRoute path="/user/s/:username" component={SingleUserPage} />
 
           {/*  Error Routes */}
           <Route component={NoMatchPage} />

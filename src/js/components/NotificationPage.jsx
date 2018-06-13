@@ -234,13 +234,11 @@ class NotificationPage extends Component {
 
 NotificationPage.propTypes = {
   "classes": PropTypes.object.isRequired,
-  "user": PropTypes.object.isRequired,
-  "isLoggedIn": PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    "user": state.userReducer.user,
+    "admin": state.userReducer.user,
     "isLoggedIn": state.userReducer.isLoggedIn,
     "notificationList": state.notificationReducer.list,
     "totalCount": state.notificationReducer.totalCount,

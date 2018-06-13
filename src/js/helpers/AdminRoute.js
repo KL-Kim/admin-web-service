@@ -3,12 +3,12 @@ import _ from 'lodash';
 import { Route, Redirect } from 'react-router-dom';
 
 const AdminRoute = ({ component: Component, ...rest }) => {
-  const user = _.isUndefined(rest.location.state) ? null : rest.location.state.user;
+  const admin = _.isUndefined(rest.location.state) ? null : rest.location.state.admin;
 
   return (<Route
     {...rest}
     render={props =>
-      user && (user.role === 'admin' || user.role === 'god') ? (
+      admin && (admin.role === 'manager' || admin.role === 'admin' || admin.role === 'god') ? (
         <Component {...props} />
       ) : (
         <Redirect

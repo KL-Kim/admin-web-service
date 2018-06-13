@@ -268,7 +268,7 @@ class CommentsList extends Component {
           >
             <DialogTitle id="comment-dialog-title">
               <Link to={{
-                  pathname: "/admin/user/" + this.state.username,
+                  pathname: "/user/s/" + this.state.username,
                   hash: '#',
                   state: {
                     "admin": this.props.admin,

@@ -50,12 +50,11 @@ class Sidebar extends Component {
               paper: classes.drawerPaper
             }}
           >
-
             <MenuList>
               <LinkContainer to={{
                   pathname: "/dashboard",
                   state: {
-                    user: user
+                    admin: user
                   },
                 }}>
                 <MenuItem selected={match.path === "/dashboard"}>
@@ -66,12 +65,10 @@ class Sidebar extends Component {
                 </MenuItem>
               </LinkContainer>
 
-
-
               <LinkContainer to={{
                   pathname: "/notification",
                   state: {
-                    user: user
+                    admin: user
                   },
                 }}>
                 <MenuItem selected={match.path === "/notification"}>
@@ -83,9 +80,24 @@ class Sidebar extends Component {
               </LinkContainer>
 
               <LinkContainer to={{
+                  pathname: "/user",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem selected={match.path === "/user"}>
+                  <ListItemIcon>
+                    <Group />
+                  </ListItemIcon>
+                  <ListItemText primary="Users" classes={match.path === "/user" ? { primary: classes.selected } : {}} />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
                   pathname: "/business",
                   state: {
-                    user: user
+                    admin: user
                   },
                 }}
               >
@@ -100,7 +112,7 @@ class Sidebar extends Component {
               <LinkContainer to={{
                   pathname: "/category",
                   state: {
-                    user: user
+                    admin: user
                   },
                 }}
               >
@@ -115,7 +127,7 @@ class Sidebar extends Component {
               <LinkContainer to={{
                   pathname: "/tag",
                   state: {
-                    user: user
+                    admin: user
                   },
                 }}
               >
@@ -130,9 +142,10 @@ class Sidebar extends Component {
               <LinkContainer to={{
                   pathname: "/review",
                   state: {
-                    user: user
+                    admin: user
                   },
-                }}>
+                }}
+              >
                 <MenuItem selected={match.path === "/review"}>
                   <ListItemIcon>
                     <RateReview />
@@ -144,9 +157,10 @@ class Sidebar extends Component {
               <LinkContainer to={{
                   pathname: "/post",
                   state: {
-                    user: user
+                    admin: user
                   },
-                }}>
+                }}
+              >
                 <MenuItem selected={match.path === "/post"}>
                   <ListItemIcon>
                     <Book />
@@ -158,9 +172,10 @@ class Sidebar extends Component {
               <LinkContainer to={{
                   pathname: "/comment",
                   state: {
-                    user: user
+                    admin: user
                   },
-                }}>
+                }}
+              >
                 <MenuItem selected={match.path === "/comment"}>
                   <ListItemIcon>
                     <QuestionAnswer />
@@ -168,29 +183,7 @@ class Sidebar extends Component {
                   <ListItemText primary="Comments" classes={match.path === "/comment" ? { primary: classes.selected } : {}} />
                 </MenuItem>
               </LinkContainer>
-
-              {
-                (role === 'admin' || role === 'god')
-                  ? (
-                      <LinkContainer to={{
-                          pathname: "/user",
-                          state: {
-                            user: user
-                          },
-                        }}
-                      >
-                        <MenuItem selected={match.path === "/user"}>
-                          <ListItemIcon>
-                            <Group />
-                          </ListItemIcon>
-                          <ListItemText primary="Users" classes={match.path === "/user" ? { primary: classes.selected } : {}} />
-                        </MenuItem>
-                      </LinkContainer>
-                    )
-                  : ''
-              }
             </MenuList>
-
           </Drawer>
       </div>
     );

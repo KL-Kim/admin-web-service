@@ -43,7 +43,7 @@ DashboardPage.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    "user": state.userReducer.user,
+    "admin": state.userReducer.user,
     "isLoggedIn:": state.userReducer.isLoggedIn,
   };
 };

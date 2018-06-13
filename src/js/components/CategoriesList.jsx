@@ -373,8 +373,8 @@ class CategoryList extends Component {
 CategoryList.propTypes = {
   "classes": PropTypes.object.isRequired,
   "history": PropTypes.object.isRequired,
-  "admin": PropTypes.object.isRequired,
   "categoriesList": PropTypes.array.isRequired,
+  "totalCount": PropTypes.number.isRequired,
   "isFetching": PropTypes.bool.isRequired,
   "getCategoriesList": PropTypes.func.isRequired,
   "addNewCategory": PropTypes.func.isRequired,
@@ -382,8 +382,8 @@ CategoryList.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    "admin": state.userReducer.user,
     "categoriesList": state.categoryReducer.categoriesList,
+    "totalCount": state.categoryReducer.totalCount,
     "isFetching": state.categoryReducer.isFetching,
   };
 };

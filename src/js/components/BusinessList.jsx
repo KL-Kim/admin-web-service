@@ -222,7 +222,7 @@ class BusinessList extends Component {
   }
 
   render() {
-    const { classes, user, businessList } = this.props;
+    const { classes, admin, businessList } = this.props;
 
     return (
       <SettingContainer>
@@ -306,7 +306,7 @@ class BusinessList extends Component {
                     pathname: "/business/s/new",
                     hash: '#',
                     state: {
-                      "user": user,
+                      "admin": admin,
                     }
                   }}
                 >
@@ -340,7 +340,7 @@ class BusinessList extends Component {
                         pathname: "/business/" + business.cnName,
                         hash: '#',
                         state: {
-                          "user": user,
+                          "admin": admin,
                           "businessId": business._id
                         }
                       }} key={index}
@@ -394,13 +394,13 @@ class BusinessList extends Component {
 BusinessList.propTypes = {
   "classes": PropTypes.object.isRequired,
   "history": PropTypes.object.isRequired,
-  "user": PropTypes.object.isRequired,
+  "admin": PropTypes.object.isRequired,
   "getBusinessListByAdmin": PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    "user": state.userReducer.user,
+    "admin": state.userReducer.user,
     "businessList": state.businessReducer.businessList,
     "totalCount": state.businessReducer.totalCount,
     "isFetching": state.businessReducer.isFetching,

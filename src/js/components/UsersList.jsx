@@ -193,12 +193,12 @@ class UsersList extends Component {
     return (
       <SettingContainer>
         <div>
-          <Typography type="display1" gutterBottom>
+          <Typography variant="display1" gutterBottom>
             Users List
           </Typography>
 
           <Grid container spacing={16}>
-            <Grid item xs={4}>
+            <Grid item xs={8}>
               <form onSubmit={this.handleSearch}>
                 <FormControl fullWidth>
                   <InputLabel htmlFor="adornment-password">Search</InputLabel>
@@ -224,7 +224,7 @@ class UsersList extends Component {
               </form>
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={6}>
               <FormControl fullWidth >
                 <FormLabel component="label">Role</FormLabel>
                 <RadioGroup
@@ -243,7 +243,7 @@ class UsersList extends Component {
               </FormControl>
             </Grid>
 
-            <Grid item xs={4}>
+            <Grid item xs={6}>
               <FormControl fullWidth >
                 <FormLabel component="label">User Status</FormLabel>
                 <RadioGroup
@@ -276,8 +276,7 @@ class UsersList extends Component {
                 { _.isEmpty(this.state.users) ? (<TableRow></TableRow>)
                   : this.state.users.map((user, index) => (
                     <LinkContainer to={{
-                        pathname: "/admin/user/" + user.username,
-                        hash: '#',
+                        pathname: "/user/s/" + user.username,
                         state: {
                           "admin": this.props.admin,
                           "userId": user._id
@@ -298,7 +297,6 @@ class UsersList extends Component {
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    colSpan={3}
                     count={this.state.totalCount}
                     rowsPerPage={this.state.rowsPerPage}
                     rowsPerPageOptions={[10, 20, 30]}
