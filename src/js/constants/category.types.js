@@ -1,0 +1,17 @@
+const categoryTypes = {
+  // Get categories
+  "GET_CATEGORY_REQUEST": "GET_CATEGORY_REQUEST",
+  "GET_CATEGORY_SUCCESS": "GET_CATEGORY_SUCCESS",
+  "GET_CATEGORY_FAILURE": "GET_CATEGORY_FAILURE",
+
+  // Add new category
+  "ADD_CATEGORY_REQUEST": "ADD_CATEGORY_REQUEST",
+
+  // Update category
+  "UPDATE_CATEGORY_REQUEST": "UPDATE_CATEGORY_REQUEST",
+
+  // Delete category
+  "DELETE_CATEGORY_REQUEST": "DELETE_CATEGORY_REQUEST",
+}
+
+export default categoryTypes;
