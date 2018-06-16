@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+DISSOLUTEimport React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -145,7 +145,7 @@ class SingleBusinessPage extends Component {
         enName: '',
       },
       "tags": [],
-      state: 'draft',
+      status: 'DRAFT',
       cnName: '',
       krName: '',
       enName: '',
@@ -154,7 +154,7 @@ class SingleBusinessPage extends Component {
       supportedLanguage: [],
       payment: [],
       delivery: '',
-      status: 'normal',
+      businessState: 'NORMAL',
       "address": {
         province: {
           name: '',
@@ -264,7 +264,7 @@ class SingleBusinessPage extends Component {
             enName: _.isEmpty(business.category) ? '' : business.category.enName || '',
           },
           priority: business.priority || 0,
-          state: business.state || '',
+          businessState: business.businessState || '',
           cnName: business.cnName || '',
           krName: business.krName || '',
           enName: business.enName || '',
@@ -715,7 +715,7 @@ class SingleBusinessPage extends Component {
       && this.state.address.area.code
     ) {
       const data = {
-        state: this.state.state,
+        businessState: this.state.businessState,
         priority: this.state.priority,
         cnName: this.state.cnName,
         krName: this.state.krName,
@@ -865,17 +865,17 @@ class SingleBusinessPage extends Component {
               <Grid item xs={4}>
                 <Paper className={classes.paper}>
                   <FormControl fullWidth >
-                    <FormLabel component="label" required error>State</FormLabel>
+                    <FormLabel component="label" required error>Status</FormLabel>
                     <RadioGroup
                       row
-                      aria-label="state"
-                      name="state"
-                      value={this.state.state}
+                      aria-label="status"
+                      name="status"
+                      value={this.state.status}
                       onChange={this.handleChange}
                     >
-                      <FormControlLabel value="draft" control={<Radio />} label="Draft" />
-                      <FormControlLabel value="published" control={<Radio />} label="Published" />
-                      <FormControlLabel value="trash" control={<Radio />} label="Trash" />
+                      <FormControlLabel value="DRAFT" control={<Radio />} label="Draft" />
+                      <FormControlLabel value="PUBLISHED" control={<Radio />} label="Published" />
+                      <FormControlLabel value="TRASH" control={<Radio />} label="Trash" />
                     </RadioGroup>
                   </FormControl>
                 </Paper>
@@ -884,16 +884,16 @@ class SingleBusinessPage extends Component {
               <Grid item xs={4}>
                 <Paper className={classes.paper}>
                   <FormControl fullWidth error>
-                    <FormLabel component="label" required>Business Status</FormLabel>
+                    <FormLabel component="label" required>Business State</FormLabel>
                     <RadioGroup
                       row
-                      aria-label="status"
-                      name="status"
-                      value={this.state.status}
+                      aria-label="businessState"
+                      name="businessState"
+                      value={this.state.businessState}
                       onChange={this.handleChange}
                     >
-                      <FormControlLabel value="normal" control={<Radio />} label="Normal" />
-                      <FormControlLabel value="dissolute" control={<Radio />} label="Dissolute" />
+                      <FormControlLabel value="NORMAL" control={<Radio />} label="Normal" />
+                      <FormControlLabel value="DISSOLUTE" control={<Radio />} label="Dissolute" />
                     </RadioGroup>
                   </FormControl>
                 </Paper>

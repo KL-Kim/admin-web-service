@@ -170,6 +170,7 @@ class BlogList extends Component {
                       <TableCell>Publish Date</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>State</TableCell>
+                      <TableCell>Reports</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -184,9 +185,10 @@ class BlogList extends Component {
                               <TableCell>{item.authorId.username}</TableCell>
                               <TableCell>{item.title}</TableCell>
                               <TableCell>{item.summary}</TableCell>
-                              <TableCell>{ElapsedTime(item.updatedAt)}</TableCell>
+                              <TableCell>{item.publishedAt ? ElapsedTime(item.publishedAt): 'Not published'}</TableCell>
                               <TableCell>{item.status}</TableCell>
                               <TableCell>{item.state}</TableCell>
+                              <TableCell>{item.reports.length}</TableCell>
                             </TableRow>
                         ))
                     }
