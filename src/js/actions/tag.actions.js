@@ -10,9 +10,9 @@ import { fetchCategoriesOrTags, tagOperationFetch } from '../api/business.servic
 
 /**
  * Get business tags list
- @param {String} search - Search term
+ * @param {Object} params - Parameter object
  */
-export const getTagsList = (search) => {
+export const getTagsList = (params) => {
   const _getTagsRequest = () => ({
     "type": tagTypes.GET_TAGS_REQUEST,
     "meta": {},
@@ -39,7 +39,7 @@ export const getTagsList = (search) => {
   return (dispatch, getState) => {
     dispatch(_getTagsRequest());
 
-    return fetchCategoriesOrTags("TAG", search)
+    return fetchCategoriesOrTags("TAG", params)
       .then(response => {
         return dispatch(_getTagsSuccess(response));
       })

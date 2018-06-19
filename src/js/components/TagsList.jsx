@@ -13,7 +13,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import FormControl from '@material-ui/core/FormControl';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -24,6 +23,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
 
 // Material UI Icons
 import Search from '@material-ui/icons/Search';
@@ -67,6 +71,7 @@ class TagsList extends Component {
       "enName": '',
       "krName": '',
       "cnName": '',
+      "orderBy": 'priority',
     };
 
     this.handleAddNewDialogOpen = this.handleAddNewDialogOpen.bind(this);
@@ -77,10 +82,13 @@ class TagsList extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCloseConfirmationDialog = this.handleCloseConfirmationDialog.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleSort = this.handleSort.bind(this);
   }
 
   componentDidMount() {
-    this.props.getTagsList();
+    this.props.getTagsList({
+      "orderBy": this.state.orderBy,
+    });
   }
 
   handleChange(e) {
@@ -107,6 +115,7 @@ class TagsList extends Component {
       "enName": '',
       "krName": '',
       "cnName": '',
+      'priority': 0,
     });
   }
 
@@ -124,42 +133,53 @@ class TagsList extends Component {
       krName: tag.krName,
       cnName: tag.cnName,
       enName: tag.enName,
+      priority: tag.priority,
       AddNewDiaglogOpen: true,
     });
   }
 
   handleSearch(e) {
     e.preventDefault();
-    const { search } = this.state;
 
-    this.props.getTagsList(search);
+    this.props.getTagsList({
+      search: this.state.search,
+      "orderBy": this.state.orderBy,
+    });
   }
 
   handleSubmit() {
-    const { _id, code, enName, krName, cnName, isNew } = this.state;
+    const { _id, code, enName, krName, cnName, priority, isNew, search } = this.state;
 
     if (code && enName && krName && cnName) {
       if (isNew) {
         this.props.addNewTag({
-          code: code,
-          enName: enName,
-          krName: krName,
-          cnName: cnName,
+          code,
+          enName,
+          krName,
+          cnName,
+          priority,
         }).then(response => {
           if (response) {
-            this.props.getTagsList(this.state.search);
+            this.props.getTagsList({
+              search,
+              "orderBy": this.state.orderBy,
+            });
           }
         });
       } else {
         this.props.updateTag({
-          _id: _id,
-          code: code,
-          enName: enName,
-          krName: krName,
-          cnName: cnName,
+          _id,
+          code,
+          enName,
+          krName,
+          cnName,
+          priority,
         }).then(response => {
           if (response) {
-            this.props.getTagsList(this.state.search);
+            this.props.getTagsList({
+              search,
+              "orderBy": this.state.orderBy,
+            });
           }
         });
       }
@@ -182,7 +202,10 @@ class TagsList extends Component {
       this.props.deleteTag(this.state._id)
         .then(response => {
           if (response) {
-            this.props.getTagsList(this.state.search);
+            this.props.getTagsList({
+              search: this.state.search,
+              "orderBy": this.state.orderBy,
+            });
 
             this.setState({
               AddNewDiaglogOpen: false,
@@ -199,6 +222,22 @@ class TagsList extends Component {
     }
   }
 
+  handleSort(e) {
+    const { value } = e.target;
+
+    this.props.getTagsList({
+      search: this.state.search,
+      orderBy: value
+    })
+    .then(response => {
+      if (response) {
+        this.setState({
+          orderBy: value
+        });
+      }
+    });
+  }
+
   render() {
     const { classes, tagsList } = this.props;
     const { code, enName, krName, cnName, isNew } = this.state;
@@ -211,7 +250,7 @@ class TagsList extends Component {
           </Typography>
 
           <Grid container spacing={16} className={classes.container}>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
               <form onSubmit={this.handleSearch}>
                 <FormControl fullWidth>
                   <InputLabel htmlFor="adornment-password">Search</InputLabel>
@@ -235,7 +274,24 @@ class TagsList extends Component {
                 </FormControl>
               </form>
             </Grid>
-            <Grid item xs={8}>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth >
+                <FormLabel component="label">Sort</FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="orderBy"
+                  name="orderBy"
+                  value={this.state.orderBy}
+                  onChange={this.handleSort}
+                >
+                  <FormControlLabel value="" control={<Radio />} label="Default" />
+                  <FormControlLabel value="priority" control={<Radio />} label="Priority" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={6}>
               <div className={classes.buttonContainer}>
                 <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNewDialogOpen}>
                   Add New
@@ -252,20 +308,22 @@ class TagsList extends Component {
                   <TableCell>한국어</TableCell>
                   <TableCell>中文名</TableCell>
                   <TableCell>Slug</TableCell>
+                  <TableCell>Priority</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {
                   _.isEmpty(tagsList) ? (<TableRow></TableRow>)
-                  : tagsList.map((c, index) => (
+                  : tagsList.map((item) => (
 
-                      <TableRow hover key={index}
-                        onClick={event => this.handleRowClick(event, c)}
+                      <TableRow hover key={item._id}
+                        onClick={event => this.handleRowClick(event, item)}
                       >
-                        <TableCell>{c.code}</TableCell>
-                        <TableCell>{c.krName}</TableCell>
-                        <TableCell>{c.cnName}</TableCell>
-                        <TableCell>{c.enName}</TableCell>
+                        <TableCell>{item.code}</TableCell>
+                        <TableCell>{item.krName}</TableCell>
+                        <TableCell>{item.cnName}</TableCell>
+                        <TableCell>{item.enName}</TableCell>
+                        <TableCell>{item.priority}</TableCell>
                       </TableRow>
                   ))
                 }
@@ -306,6 +364,9 @@ class TagsList extends Component {
                 </Grid>
                 <Grid item xs={6}>
                   <TextField fullWidth id="cnName" label="中文名" margin="normal" name="cnName" onChange={this.handleChange} value={this.state.cnName} />
+                </Grid>
+                <Grid item xs={6}>
+                  <TextField fullWidth id="priority" label="Priority" margin="normal" name="priority" onChange={this.handleChange} value={this.state.priority} />
                 </Grid>
               </Grid>
 

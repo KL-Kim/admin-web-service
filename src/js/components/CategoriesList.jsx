@@ -13,7 +13,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
-import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -25,6 +24,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormLabel from '@material-ui/core/FormLabel';
 
 // Material UI Icons
 import Search from '@material-ui/icons/Search';
@@ -69,6 +73,8 @@ class CategoryList extends Component {
       "krName": '',
       "cnName": '',
       'parent': '',
+      'priority': 0,
+      'orderBy': 'priority',
     };
 
     this.handleAddNew = this.handleAddNew.bind(this);
@@ -79,10 +85,13 @@ class CategoryList extends Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleCloseConfirmationDialog = this.handleCloseConfirmationDialog.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleSort = this.handleSort.bind(this);
   }
 
   componentDidMount() {
-    this.props.getCategoriesList();
+    this.props.getCategoriesList({
+      orderBy: this.state.orderBy,
+    });
   }
 
   handleChange(e) {
@@ -101,6 +110,7 @@ class CategoryList extends Component {
       cnName: category.cnName,
       enName: category.enName,
       parent: category.parent || '',
+      priority: category.priority,
       AddNewDiaglogOpen: true,
     });
   }
@@ -114,23 +124,28 @@ class CategoryList extends Component {
 
   handleDelete() {
     if (this.state._id) {
-      this.props.deleteCategory(this.state._id).then(response => {
-        if (response) {
-          this.props.getCategoriesList(this.state.search);
+      this.props.deleteCategory(this.state._id)
+        .then(response => {
+          if (response) {
+            this.props.getCategoriesList({
+              search: this.state.search,
+              orderBy: this.state.orderBy,
+            });
 
-          this.setState({
-            AddNewDiaglogOpen: false,
-            confirmationDialogOpen: false,
-            "isNew": false,
-            "_id": '',
-            "code": '',
-            "enName": '',
-            "krName": '',
-            "cnName": '',
-            'parent': '',
-          });
-        }
-      });
+            this.setState({
+              AddNewDiaglogOpen: false,
+              confirmationDialogOpen: false,
+              "isNew": false,
+              "_id": '',
+              "code": '',
+              "enName": '',
+              "krName": '',
+              "cnName": '',
+              'parent': '',
+              'priority': 0,
+            });
+          }
+        });
     }
   }
 
@@ -144,6 +159,7 @@ class CategoryList extends Component {
       "krName": '',
       "cnName": '',
       'parent': '',
+      'priority': 0,
     });
   }
 
@@ -157,6 +173,7 @@ class CategoryList extends Component {
       "krName": '',
       "cnName": '',
       'parent': '',
+      'priority': 0,
     });
   }
 
@@ -169,46 +186,82 @@ class CategoryList extends Component {
   handleSearch(e) {
     e.preventDefault();
 
-    this.props.getCategoriesList(this.state.search);
+    this.props.getCategoriesList({
+      search: this.state.search,
+      orderBy: this.state.orderBy,
+    });
   }
 
   handleSubmit() {
-    const { _id, code, enName, krName, cnName, parent, isNew } = this.state;
+    const { _id, code, enName, krName, cnName, parent, priority, isNew } = this.state;
 
     if (code && enName && krName && cnName) {
       if (isNew) {
         this.props.addNewCategory({
           code: code,
-          enName: enName,
-          krName: krName,
-          cnName: cnName,
-          parent: parent,
+          enName,
+          krName,
+          cnName,
+          parent,
+          priority,
         })
         .then(response => {
           if (response) {
-            this.props.getCategoriesList(this.state.search);
+            this.props.getCategoriesList({
+              search: this.state.search,
+              orderBy: this.state.orderBy,
+            });
           }
         });
       } else {
         this.props.updateCategory({
-          _id: _id,
-          code: code,
-          enName: enName,
-          krName: krName,
-          cnName: cnName,
-          parent: parent,
+          _id,
+          code,
+          enName,
+          krName,
+          cnName,
+          parent,
+          priority,
         })
         .then(response => {
           if (response) {
-            this.props.getCategoriesList(this.state.search);
+            this.props.getCategoriesList({
+              search: this.state.search,
+              orderBy: this.state.orderBy,
+            });
           }
+
+          this.setState({
+            AddNewDiaglogOpen: false,
+            isNew: false,
+            "_id": '',
+            "code": '',
+            "enName": '',
+            "krName": '',
+            "cnName": '',
+            'parent': '',
+            'priority': 0,
+          });
         });
       }
     }
 
-    this.setState({
-      AddNewDiaglogOpen: false,
-      isNew: false,
+
+  }
+
+  handleSort(e) {
+    const { value } = e.target;
+
+    this.props.getCategoriesList({
+      search: this.state.search,
+      orderBy: value
+    })
+    .then(response => {
+      if (response) {
+        this.setState({
+          orderBy: value
+        });
+      }
     });
   }
 
@@ -224,7 +277,7 @@ class CategoryList extends Component {
           </Typography>
 
           <Grid container spacing={16} className={classes.container}>
-            <Grid item xs={4}>
+            <Grid item xs={12}>
               <form onSubmit={this.handleSearch}>
                 <FormControl fullWidth>
                   <Input
@@ -248,7 +301,24 @@ class CategoryList extends Component {
                 </FormControl>
               </form>
             </Grid>
-            <Grid item xs={8}>
+
+            <Grid item xs={6}>
+              <FormControl fullWidth >
+                <FormLabel component="label">Sort</FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="orderBy"
+                  name="orderBy"
+                  value={this.state.orderBy}
+                  onChange={this.handleSort}
+                >
+                  <FormControlLabel value="" control={<Radio />} label="Default" />
+                  <FormControlLabel value="priority" control={<Radio />} label="Priority" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={6}>
               <div className={classes.buttonContainer}>
                 <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNew}>
                   Add New
@@ -266,20 +336,22 @@ class CategoryList extends Component {
                   <TableCell>中文名</TableCell>
                   <TableCell>Slug</TableCell>
                   <TableCell>Parent</TableCell>
+                  <TableCell>Priority</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {
                   _.isEmpty(categoriesList) ? (<TableRow></TableRow>)
-                  : categoriesList.map((c, index) => (
-                      <TableRow hover key={index}
-                        onClick={e => this.handleRowClick(e, c)}
+                  : categoriesList.map((item) => (
+                      <TableRow hover key={item._id}
+                        onClick={e => this.handleRowClick(e, item)}
                       >
-                        <TableCell>{c.code}</TableCell>
-                        <TableCell>{c.krName}</TableCell>
-                        <TableCell>{c.cnName}</TableCell>
-                        <TableCell>{c.enName}</TableCell>
-                        <TableCell>{c.parent}</TableCell>
+                        <TableCell>{item.code}</TableCell>
+                        <TableCell>{item.krName}</TableCell>
+                        <TableCell>{item.cnName}</TableCell>
+                        <TableCell>{item.enName}</TableCell>
+                        <TableCell>{item.parent}</TableCell>
+                        <TableCell>{item.priority}</TableCell>
                       </TableRow>
                   ))
                 }
@@ -287,86 +359,92 @@ class CategoryList extends Component {
             </Table>
           </Paper>
 
-          <Dialog
-            open={this.state.AddNewDiaglogOpen}
-            onClose={this.handleDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">
-              <Grid container>
-                <Grid item xs={6}>
-                  Category
+          <div>
+            <Dialog
+              open={this.state.AddNewDiaglogOpen}
+              onClose={this.handleDialogClose}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                <Grid container>
+                  <Grid item xs={6}>
+                    Category
+                  </Grid>
+                  <Grid item xs={6}>
+                    <div className={classes.buttonContainer}>
+                      <Button color="secondary" disabled={!(code && enName && krName && cnName) || isNew} onClick={this.handleOpenDeleteDialog}>
+                        Delete
+                      </Button>
+                    </div>
+                  </Grid>
                 </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.buttonContainer}>
-                    <Button color="secondary" disabled={!(code && enName && krName && cnName) || isNew} onClick={this.handleOpenDeleteDialog}>
-                      Delete
-                    </Button>
-                  </div>
-                </Grid>
-              </Grid>
-            </DialogTitle>
-            <DialogContent>
-              <Grid container spacing={16}>
-                <Grid item xs={6}>
-                  <TextField fullWidth id="code" label="Code" margin="normal" name="code" onChange={this.handleChange} value={this.state.code} />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField fullWidth id="enName" label="English" margin="normal" name="enName" onChange={this.handleChange} value={this.state.enName} />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField fullWidth id="krName" label="한국어" margin="normal" name="krName" onChange={this.handleChange} value={this.state.krName} />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField fullWidth id="cnName" label="中文名" margin="normal" name="cnName" onChange={this.handleChange} value={this.state.cnName} />
-                </Grid>
+              </DialogTitle>
+              <DialogContent>
+                <Grid container spacing={16}>
+                  <Grid item xs={6}>
+                    <TextField fullWidth id="code" label="Code" margin="normal" name="code" onChange={this.handleChange} value={this.state.code} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField fullWidth id="enName" label="English" margin="normal" name="enName" onChange={this.handleChange} value={this.state.enName} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField fullWidth id="krName" label="한국어" margin="normal" name="krName" onChange={this.handleChange} value={this.state.krName} />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField fullWidth id="cnName" label="中文名" margin="normal" name="cnName" onChange={this.handleChange} value={this.state.cnName} />
+                  </Grid>
 
-                <Grid item xs={6}>
-                  <FormControl fullWidth>
-                    <InputLabel htmlFor="parent">Parent</InputLabel>
-                    <Select native
-                      name="parent"
-                      value={this.state.parent}
-                      onChange={this.handleChange}
-                      input={<Input id="parent" />}
-                    >
-                      <option value="" />
-                      {
-                        _.isEmpty(categoriesList)
-                          ? ''
-                          : categoriesList.map(item => (
-                              <option key={item.code} value={item.code}>{item.krName}</option>
-                            ))
-                      }
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                type="submit"
-                variant="raised"
-                color="primary"
-                disabled={!(code && enName && krName && cnName)}
-                onClick={this.handleSubmit}
-              >
-                Save
-              </Button>
-              <Button color="primary" onClick={this.handleDialogClose}>
-                Cancel
-              </Button>
-            </DialogActions>
-          </Dialog>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth margin="normal">
+                      <InputLabel htmlFor="parent">Parent</InputLabel>
+                      <Select native
+                        name="parent"
+                        value={this.state.parent}
+                        onChange={this.handleChange}
+                        input={<Input id="parent" />}
+                      >
+                        <option value="" />
+                        {
+                          _.isEmpty(categoriesList)
+                            ? ''
+                            : categoriesList.map(item => (
+                                <option key={item.code} value={item.code}>{item.krName}</option>
+                              ))
+                        }
+                      </Select>
+                    </FormControl>
+                  </Grid>
 
-          <ConfirmationDialog
-            open={this.state.confirmationDialogOpen}
-            handleClose={this.handleCloseConfirmationDialog}
-            operation={this.handleDelete}
-            title="Warning"
-            content="Are your sure to delete the category?"
-          />
+                  <Grid item xs={6}>
+                    <TextField fullWidth id="priority" label="Priority" margin="normal" name="priority" onChange={this.handleChange} value={this.state.priority} />
+                  </Grid>
+                </Grid>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  type="submit"
+                  variant="raised"
+                  color="primary"
+                  disabled={!(code && enName && krName && cnName)}
+                  onClick={this.handleSubmit}
+                >
+                  Save
+                </Button>
+                <Button color="primary" onClick={this.handleDialogClose}>
+                  Cancel
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            <ConfirmationDialog
+              open={this.state.confirmationDialogOpen}
+              handleClose={this.handleCloseConfirmationDialog}
+              operation={this.handleDelete}
+              title="Warning"
+              content="Are your sure to delete the category?"
+            />
+          </div>
         </div>
       </SettingContainer>
     );

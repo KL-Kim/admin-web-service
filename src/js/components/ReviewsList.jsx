@@ -40,6 +40,7 @@ import Search from '@material-ui/icons/Search';
 import SettingContainer from './layout/SettingContainer';
 import ProperName from './utils/ProperName';
 import TablePaginationActions from './utils/TablePaginationActions';
+import getElapsedTime from '../helpers/ElapsedTime';
 
 // Actions
 import { getReviews, clearReviewsList, editReview } from '../actions/review.actions';
@@ -218,9 +219,10 @@ class ReviewsList extends Component {
                       <TableCell>User</TableCell>
                       <TableCell>Business</TableCell>
                       <TableCell>Content</TableCell>
+                      <TableCell>Time</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Quality</TableCell>
-                      <TableCell>Up Vote</TableCell>
+
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -232,13 +234,14 @@ class ReviewsList extends Component {
                           >
                             <TableCell>{index + 1}</TableCell>
                             <TableCell><ProperName user={review.user} /></TableCell>
-                            <TableCell>{review.business.krName}</TableCell>
+                            <TableCell>{(_.isEmpty(review.business)) ? '': review.business.krName}</TableCell>
                             <TableCell>
                               <div dangerouslySetInnerHTML={{__html: review.content}} />
                             </TableCell>
+                            <TableCell>{getElapsedTime(review.createdAt)}</TableCell>
                             <TableCell>{review.status}</TableCell>
                             <TableCell>{review.quality}</TableCell>
-                            <TableCell>{review.upvote.length}</TableCell>
+
                           </TableRow>
                       ))
                     }

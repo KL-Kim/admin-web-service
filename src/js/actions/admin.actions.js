@@ -148,6 +148,8 @@ export const editUser = (id, { role, userStatus } = {}) => {
       return dispatch(AlertActions.alertFailure("Bad request!"));
     }
 
+    dispatch(_editUserRequest());
+
     return getToken()
       .then(token => {
         return editUserFetch(token, id, { role, userStatus });

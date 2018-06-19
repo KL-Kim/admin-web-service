@@ -8,32 +8,24 @@ import * as AlertActions from './alert.actions';
 import { getToken } from '../api/auth.service';
 import { fetchCategoriesOrTags, categoryOperationFetch } from '../api/business.service';
 
-
-
 /**
  * Get business categories list
- * @param {String} search - Search term
+ * @param {Object} params - Parameter object
  */
-export const getCategoriesList = (search) => {
+export const getCategoriesList = (params) => {
   const _getCategoriesRequest = () => ({
     "type": categoryTypes.GET_CATEGORY_REQUEST,
   });
 
-  /**
-   * Get categories list successfully
-   */
-  const _getCategoriesSuccess = (reponse) => ({
+  const _getCategoriesSuccess = (response) => ({
     "type": categoryTypes.GET_CATEGORY_SUCCESS,
     "meta": {},
     "error": null,
     "payload": {
-      list: reponse
+      list: response
     }
   });
 
-  /**
-   * Get categories list failed
-   */
   const _getCategoriesFailure = (error) => ({
     "type": categoryTypes.GET_CATEGORY_FAILURE,
     "meta": {},
@@ -44,7 +36,7 @@ export const getCategoriesList = (search) => {
   return (dispatch, getState) => {
     dispatch(_getCategoriesRequest());
 
-    return fetchCategoriesOrTags("CATAGORY", search)
+    return fetchCategoriesOrTags("CATAGORY", params)
       .then(response => {
         return dispatch(_getCategoriesSuccess(response));
       })
