@@ -35,7 +35,7 @@ import Search from '@material-ui/icons/Search';
 import SettingContainer from './layout/SettingContainer';
 import LinkContainer from './utils/LinkContainer';
 import TablePaginationActions from './utils/TablePaginationActions';
-import { getBusinessListByAdmin, clearBusinessList } from '../actions/business.actions.js';
+import { getBusinessList, clearBusinessList } from '../actions/business.actions.js';
 
 const styles = (theme) => ({
   "container": {
@@ -58,45 +58,41 @@ class BusinessList extends Component {
       "search": '',
       "rowsPerPage": 10,
       "page": 0,
-      "state": '',
+      "status": '',
       "event": false,
       "reports": false,
+      "orderBy": 'new',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSearch = this.handleSearch.bind(this);
     this.handleEventSwitch = this.handleEventSwitch.bind(this);
     this.handleReportSwitch = this.handleReportSwitch.bind(this);
-    this.handleChangeState = this.handleChangeState.bind(this);
+    this.hanldeChangeStatus = this.hanldeChangeStatus.bind(this);
     this.handlePaginationChange = this.handlePaginationChange.bind(this);
     this.handleChangeRowsPerPage = this.handleChangeRowsPerPage.bind(this);
   }
 
   componentDidMount() {
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       limit: this.state.rowsPerPage,
-      filter: {
-      "state": ''
-      },
+      orderBy: this.state.orderBy,
     });
   }
 
-  componentWillUnmount() {
-    this.props.clearBusinessList();
-  }
-
   handlePaginationChange(e, page) {
-    const { rowsPerPage, state, search, reports, event } = this.state;
+    const { rowsPerPage, status, search, reports, event, orderBy } = this.state;
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-        "state": state,
-        "event": event,
-        "reports": reports,
+        status,
+        event,
+        reports,
       },
-      search: search
+      search,
+      orderBy,
     })
     .then(response => {
       if (response) {
@@ -108,17 +104,18 @@ class BusinessList extends Component {
   }
 
   handleChangeRowsPerPage(e) {
-    const { page, state, search, reports, event } = this.state;
+    const { page, status, search, reports, event, orderBy } = this.state;
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * e.target.value,
       limit: e.target.value,
       filter: {
-        "state": state,
-        "event": event,
-        "reports": reports,
+        status,
+        event,
+        reports,
       },
-      search: search
+      search,
+      orderBy,
     })
     .then(response => {
       if (response) {
@@ -131,24 +128,26 @@ class BusinessList extends Component {
 
   handleChange(e) {
     const { name, value } = e.target;
+
     this.setState({
       [name]: value
     });
   }
 
   handleEventSwitch(e) {
-    const { page, rowsPerPage, state, search, reports } = this.state;
+    const { page, rowsPerPage, status, search, reports, orderBy } = this.state;
     const checked = e.target.checked;
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-      "state": state,
+      status,
       "event": checked,
-      "reports": reports,
+      reports,
       },
-      search: search
+      search,
+      orderBy,
     })
     .then(response => {
       if (response) {
@@ -160,18 +159,19 @@ class BusinessList extends Component {
   }
 
   handleReportSwitch(e) {
-    const { page, rowsPerPage, state, search, event } = this.state;
+    const { page, rowsPerPage, status, search, event, orderBy } = this.state;
     const checked = e.target.checked;
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-        "state": state,
-        "event": event,
-        "reports": checked
+        status,
+        event,
+        reports: checked
       },
-      search: search,
+      search,
+      orderBy,
     })
     .then(response => {
       if (response) {
@@ -182,24 +182,25 @@ class BusinessList extends Component {
     })
   }
 
-  handleChangeState(e) {
+  hanldeChangeStatus(e) {
     const { value } = e.target;
-    const { page, rowsPerPage, event, reports, search } = this.state
+    const { page, rowsPerPage, event, reports, search, orderBy } = this.state
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-        "state": value,
-        "event": event,
-        "reports": reports,
+        status: value,
+        event,
+        reports,
       },
-      search: search
+      search,
+      orderBy,
     })
     .then(response => {
       if (response) {
         this.setState({
-          state: value,
+          status: value,
           event: event,
         });
       }
@@ -208,16 +209,18 @@ class BusinessList extends Component {
 
   handleSearch(e) {
     e.preventDefault();
-    const { page, rowsPerPage, state, event, search } = this.state;
+    const { page, rowsPerPage, status, reports, event, search, orderBy } = this.state;
 
-    this.props.getBusinessListByAdmin({
+    this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-        state,
-        event
+        status,
+        event,
+        reports
       },
-      search: search
+      search,
+      orderBy,
     });
   }
 
@@ -260,18 +263,18 @@ class BusinessList extends Component {
           <Grid container>
             <Grid item xs={4}>
               <FormControl fullWidth >
-                <FormLabel component="label">State</FormLabel>
+                <FormLabel component="label">Status</FormLabel>
                 <RadioGroup
                   row
-                  aria-label="State"
-                  name="state"
-                  value={this.state.state}
-                  onChange={this.handleChangeState}
+                  aria-label="Status"
+                  name="status"
+                  value={this.state.status}
+                  onChange={this.hanldeChangeStatus}
                 >
                   <FormControlLabel value="" control={<Radio />} label="All" />
-                  <FormControlLabel value="published" control={<Radio />} label="Published" />
-                  <FormControlLabel value="draft" control={<Radio />} label="Draft" />
-                  <FormControlLabel value="trash" control={<Radio />} label="Trash" />
+                  <FormControlLabel value="PUBLISHED" control={<Radio />} label="Published" />
+                  <FormControlLabel value="DRAFT" control={<Radio />} label="Draft" />
+                  <FormControlLabel value="TRASH" control={<Radio />} label="Trash" />
                 </RadioGroup>
               </FormControl>
             </Grid>
@@ -325,11 +328,10 @@ class BusinessList extends Component {
                   <TableCell>Index</TableCell>
                   <TableCell>中文名</TableCell>
                   <TableCell>한국어</TableCell>
-                  <TableCell>Priority</TableCell>
                   <TableCell>Category</TableCell>
-                  <TableCell>Month Views Count</TableCell>
-                  <TableCell>Total Views Count</TableCell>
-                  <TableCell>State</TableCell>
+                  <TableCell>Views Count</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Priority</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -337,7 +339,7 @@ class BusinessList extends Component {
                   _.isEmpty(businessList) ? (<TableRow></TableRow>)
                   : businessList.map((business, index) => (
                     <LinkContainer to={{
-                        pathname: "/business/" + business.cnName,
+                        pathname: "/business/s/" + business.enName,
                         hash: '#',
                         state: {
                           "admin": admin,
@@ -359,11 +361,10 @@ class BusinessList extends Component {
                           }
                         </TableCell>
                         <TableCell>{business.krName}</TableCell>
-                        <TableCell>{business.priority}</TableCell>
                         <TableCell>{_.isEmpty(business.category) ? '' : business.category.krName}</TableCell>
-                        <TableCell>{business.monthViewsCount}</TableCell>
                         <TableCell>{business.viewsCount}</TableCell>
-                        <TableCell>{_.upperFirst(business.state)}</TableCell>
+                        <TableCell>{business.status}</TableCell>
+                        <TableCell>{business.priority}</TableCell>
                       </TableRow>
                     </LinkContainer>
                   ))
@@ -395,7 +396,7 @@ BusinessList.propTypes = {
   "classes": PropTypes.object.isRequired,
   "history": PropTypes.object.isRequired,
   "admin": PropTypes.object.isRequired,
-  "getBusinessListByAdmin": PropTypes.func.isRequired,
+  "getBusinessList": PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -407,4 +408,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getBusinessListByAdmin, clearBusinessList })(withStyles(styles)(BusinessList));
+export default connect(mapStateToProps, { getBusinessList, clearBusinessList })(withStyles(styles)(BusinessList));

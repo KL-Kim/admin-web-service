@@ -9,70 +9,23 @@ import responseErrorHandler from '../helpers/error-handler.js';
  * Business serivce uri
  */
 const businessSerivceUri = {
-  commonUrl: config.API_GATEWAY_ROOT + '/api/v1/business?',
-  getBusinessListByAdmin: config.API_GATEWAY_ROOT + '/api/v1/business/admin?',
-  getSingleBusinessUrl: config.API_GATEWAY_ROOT + '/api/v1/business/single/',
+  commonUrl: config.API_GATEWAY_ROOT + '/api/v1/business',
+  adminUrl: config.API_GATEWAY_ROOT + '/api/v1/business/admin',
+  singleUrl: config.API_GATEWAY_ROOT + '/api/v1/business/single/',
+  businessImagesUrl: config.API_GATEWAY_ROOT + '/api/v1/business/images/',
   categoryUrl: config.API_GATEWAY_ROOT + '/api/v1/category',
   tagUrl: config.API_GATEWAY_ROOT + '/api/v1/tag',
-  businessImagesUrl: config.API_GATEWAY_ROOT + '/api/v1/business/images',
-  reportBusinessUrl: config.API_GATEWAY_ROOT + '/api/v1/business/report/',
 };
 
 /**
- * Fetch business list
+ * Fetch business list by admin
  * @property {Number} skip - Number of business to skip
  * @property {Number} limit - Number of business to limit
  * @property {Object} filter - Business list filter
  * @property {String} search - Search business
  * @property {String} orderBy - List order
  */
-export const fetchBusinessList = ({ skip, limit, filter, search, orderBy } = {}) => {
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  let url = businessSerivceUri.commonUrl;
-
-  if (_.isNumber(skip)) url = url + '&skip=' + skip;
-  if (_.isNumber(limit)) url = url + '&limit=' + limit;
-  if (!_.isEmpty(filter)) {
-    if (!!filter.category) url = url + '&category=' + filter.category;
-    if (!!filter.area) url = url + '&area=' + filter.area;
-    if (!!filter.event) url = url + '&event=1';
-    if (!!filter.list) url = url + '&list=' + filter.list;
-  }
-
-  if (orderBy) {
-    url = url + '&orderBy=' + orderBy;
-  }
-
-  if (!_.isEmpty(search)) url = url+ '&search=' + search;
-
-  return fetch(url, options)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return Promise.reject(responseErrorHandler(response));
-      }
-    })
-    .catch(err => {
-      return Promise.reject(err);
-    });
-}
-
-/**
- * Fetch business list by category
- * @param {Number} skip - Number of business to skip
- * @param {Number} limit - Number of business to limit
- * @param {Object} filter - Business list filter
- * @param {String} search - Search business
- * @param {String} orderBy - List order
- */
-export const fetchBusinessListByAdmin= (token, { skip, limit, filter = {}, search, orderBy } = {}) => {
+export const fetchBusinessList = (token, { skip, limit, filter, search, orderBy } = {}) => {
   const options = {
     method: 'GET',
     headers: {
@@ -81,22 +34,24 @@ export const fetchBusinessListByAdmin= (token, { skip, limit, filter = {}, searc
     },
   };
 
-  let url = businessSerivceUri.getBusinessListByAdmin;
+  let url = businessSerivceUri.adminUrl + '?';
 
   if (_.isNumber(skip)) url = url + '&skip=' + skip;
   if (_.isNumber(limit)) url = url + '&limit=' + limit;
-
   if (!_.isEmpty(filter)) {
-    if (!!filter.state) url = url + '&state=' + filter.state;
+    if (!!filter.category) url = url + '&category=' + filter.category;
+    if (!!filter.area) url = url + '&area=' + filter.area;
     if (!!filter.event) url = url + '&event=1';
     if (!!filter.reports) url = url + '&reports=1';
+    if (!!filter.list) url = url + '&list=' + filter.list;
+    if (!!filter.status) url = url + '&status=' + filter.status;
   }
 
   if (orderBy) {
     url = url + '&orderBy=' + orderBy;
   }
 
-  if (!_.isEmpty(search)) url = url+ '&search=' + search;
+  if (search) url = url+ '&search=' + search;
 
   return fetch(url, options)
     .then(response => {
@@ -113,11 +68,9 @@ export const fetchBusinessListByAdmin= (token, { skip, limit, filter = {}, searc
 
 /**
  * Fetch single business
- * @param {String} type - Enum: id, enName
- * @param {String} value - Type value
- * @param {String} by - User id
+ * @param {String} slug - Type value
  */
-export const fetchSingleBusiness = (type, value, by) => {
+export const fetchSingleBusiness = (slug) => {
   const options = {
     method: 'GET',
     headers: {
@@ -125,11 +78,7 @@ export const fetchSingleBusiness = (type, value, by) => {
     },
   };
 
-  let url = businessSerivceUri.getSingleBusinessUrl + '?' + type + '=' + value;
-
-  if (by) url = url + '&by=' + by;
-
-  return fetch(url, options)
+  return fetch(businessSerivceUri.singleUrl + slug, options)
     .then(response => {
       if (response.ok) {
         return response.json();
@@ -143,37 +92,19 @@ export const fetchSingleBusiness = (type, value, by) => {
 }
 
 /**
- * Add, update, delete business
- * @param {String} type - Operation type
+ * Add new business
  * @param {String} token - Verification code
  * @param {Object} data - Business data
  */
-export const businessOpertationFetch = (type, token, data) => {
+export const addBusinessFetch = (token, data) => {
   const options = {
-    method: '',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       "Authorization": 'Bearer ' + token,
     },
     body: JSON.stringify(data),
   };
-
-  switch (type) {
-    case "ADD":
-      options.method = "POST";
-      break;
-
-    case "UPDATE":
-      options.method = "PUT";
-      break;
-
-    case "DELETE":
-      options.method = "DELETE";
-      break;
-
-    default:
-      return Promise.reject(new Error("Type is missing"));
-  }
 
   return fetch(businessSerivceUri.commonUrl, options)
     .then(response => {
@@ -189,9 +120,67 @@ export const businessOpertationFetch = (type, token, data) => {
 }
 
 /**
+ * Update  business
+ * @param {String} token - Verification code
+ * @param {String} id - Business Id
+ * @param {Object} data - Business data
+ */
+export const updateBusinessFetch = (token, id, data) => {
+  const options = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      "Authorization": 'Bearer ' + token,
+    },
+    body: JSON.stringify(data),
+  };
+
+  return fetch(businessSerivceUri.singleUrl + id, options)
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        return Promise.reject(responseErrorHandler(response));
+      }
+    })
+    .catch(err => {
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * Update  business
+ * @param {String} token - Verification code
+ * @param {String} id - Business Id
+ * @param {Object} data - Business data
+ */
+export const deleteBusinessFetch = (token, id) => {
+  const options = {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      "Authorization": 'Bearer ' + token,
+    },
+  };
+
+  return fetch(businessSerivceUri.singleUrl + id, options)
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        return Promise.reject(responseErrorHandler(response));
+      }
+    })
+    .catch(err => {
+      return Promise.reject(err);
+    });
+}
+
+/**
  * Upload business images
  * @param {String} token - Verification code
- * @param {Object} data - Business data
+ * @param {String} id - Business Id
+ * @param {Object} data - Business image
  */
 export const uploadImagesFetch = (token, id, data) => {
   const options = {
@@ -202,10 +191,10 @@ export const uploadImagesFetch = (token, id, data) => {
     "body": data,
   };
 
-  return fetch(businessSerivceUri.businessImagesUrl + '/' + id, options)
+  return fetch(businessSerivceUri.businessImagesUrl + id, options)
     .then(response => {
       if (response.ok) {
-        return response.json();
+        return response;
       } else {
         return Promise.reject(responseErrorHandler(response));
       }
@@ -217,6 +206,9 @@ export const uploadImagesFetch = (token, id, data) => {
 
 /**
  * Delete business image
+ * @param {String} token - Verification code
+ * @param {String} id - Business Id
+ * @param {Object} data - Business image
  */
 export const deleteImageFetch = (token, id, data) => {
   const options = {
@@ -228,10 +220,10 @@ export const deleteImageFetch = (token, id, data) => {
     body: JSON.stringify(data),
   };
 
-  return fetch(businessSerivceUri.businessImagesUrl + '/' + id, options)
+  return fetch(businessSerivceUri.businessImagesUrl + id, options)
     .then(response => {
       if (response.ok) {
-        return response.json();
+        return response;
       } else {
         return Promise.reject(responseErrorHandler(response));
       }
@@ -239,34 +231,6 @@ export const deleteImageFetch = (token, id, data) => {
     .catch(err => {
       return Promise.reject(err);
     });
-}
-
-/**
- * Report business
- */
-export const reportBusinessFetch = (id, content, contact) => {
-  const options = {
-    "method": 'POST',
-    "headers": {
-      'Content-Type': 'application/json',
-    },
-    "body": JSON.stringify({
-      content,
-      contact,
-    }),
-  };
-
-  return fetch(businessSerivceUri.reportBusinessUrl + id, options)
-  .then(response => {
-    if (response.ok) {
-      return response;
-    } else {
-      return Promise.reject(responseErrorHandler(response));
-    }
-  })
-  .catch(err => {
-    return Promise.reject(err);
-  });
 }
 
 /**
@@ -347,7 +311,7 @@ export const categoryOperationFetch = (type, token, data) => {
   return fetch(businessSerivceUri.categoryUrl, options)
     .then(response => {
       if (response.ok) {
-        return response.json();
+        return response;
       } else {
         return Promise.reject(responseErrorHandler(response));
       }
@@ -393,7 +357,7 @@ export const tagOperationFetch = (type, token, data) => {
   return fetch(businessSerivceUri.tagUrl, options)
     .then(response => {
       if (response.ok) {
-        return response.json();
+        return response;
       } else {
         return Promise.reject(responseErrorHandler(response));
       }

@@ -15,6 +15,7 @@ import SigninPage from './components/SigninPage';
 import DashboardPage from './components/DashboardPage';
 import BusinessListPage from './components/BusinessList';
 import SingleBusinessPage from './components/SingleBusinessPage';
+import BusinessSamplePage from './components/BusinessSamplePage';
 import CategoriesList from './components/CategoriesList';
 import TagsList from './components/TagsList';
 import ReviewsList from './components/ReviewsList';
@@ -48,7 +49,8 @@ const App = () => {
           <Route path="/notification" component={NotificationPage} />
           <AdminRoute exact path="/dashboard" component={DashboardPage} />
           <AdminRoute exact path="/business" component={BusinessListPage} />
-          <AdminRoute path="/business/s/:id" component={SingleBusinessPage} />
+          <AdminRoute path="/business/s/:slug" component={SingleBusinessPage} />
+          <AdminRoute path="/business/sample/:slug" component={BusinessSamplePage} />
           <AdminRoute path="/category" component={CategoriesList} />
           <AdminRoute path="/tag" component={TagsList} />
           <AdminRoute path="/review" component={ReviewsList} />

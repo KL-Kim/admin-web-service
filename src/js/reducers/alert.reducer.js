@@ -27,7 +27,7 @@ const alertReducer = (state = initialState, action) => {
       };
 
     case alertTypes.ALERT_CLEAR:
-      return {};
+      return initialState;
 
     default:
       return state;

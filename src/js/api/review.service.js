@@ -9,27 +9,29 @@ import responseErrorHandler from '../helpers/error-handler.js';
  * Review serivce uri
  */
 const reviewSerivceUri = {
-  commonUrl: config.API_GATEWAY_ROOT + '/api/v1/review',
-  getSingleUrl: config.API_GATEWAY_ROOT + '/api/v1/review/single/',
-  voteReviewUrl: config.API_GATEWAY_ROOT + '/api/v1/review/vote/',
+  adminUrl: config.API_GATEWAY_ROOT + '/api/v1/review/admin',
 };
 
 /**
  * Get reviews by business id
+ * @param {String} token - Verification token
  * @param {Number} skip - Number of reviews to skip
  * @param {Number} limit - Number of reviews to limit
- * @param {Object} filter - Reviews list filter
- * @param {search} search - Search reviews
+ * @param {String} search - Search reviews
+ * @param {String} bid - Business Id
+ * @param {String} uid - User Id
+ * @param {String} orderBy - List order
  */
-export const fetchReviews = (skip, limit, filter = {}, search) => {
+export const fetchReviewsList = (token, { skip, limit, search, bid, uid, status, orderBy } = {}) => {
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      "Authorization": 'Bearer ' + token,
     },
   };
 
-  let url = reviewSerivceUri.commonUrl + '?';
+  let url = reviewSerivceUri.adminUrl + '?';
 
   if (skip) {
     url = url + '&skip=' + skip;
@@ -43,19 +45,22 @@ export const fetchReviews = (skip, limit, filter = {}, search) => {
     url = url + '&search=' + search;
   }
 
-  if (!_.isEmpty(filter)) {
-    if (filter.bid) {
-      url = url + '&bid=' + filter.bid;
-    }
-
-    if (filter.uid) {
-      url = url + '&uid=' + filter.uid;
-    }
-
-    if (filter.orderBy) {
-      url = url + '&orderBy=' + filter.orderBy;
-    }
+  if (bid) {
+    url = url + '&bid=' + bid;
   }
+
+  if (uid) {
+    url = url + '&uid=' + uid;
+  }
+
+  if (status) {
+    url = url + '&status=' + status;
+  }
+
+  if (orderBy) {
+    url = url + '&orderBy=' + orderBy;
+  }
+
 
   return fetch(url, options)
     .then(response => {
@@ -71,86 +76,13 @@ export const fetchReviews = (skip, limit, filter = {}, search) => {
 }
 
 /**
- * Fetch single review
- * @param {String} id - Review id
- */
-export const fetchSingleReview = id => {
-  const options = {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  return fetch(reviewSerivceUri.getSingleUrl + id, options)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return Promise.reject(responseErrorHandler(response));
-      }
-    })
-    .catch(err => {
-      return Promise.reject(err);
-    });
-}
-
-/**
- * Add, update, delete review
- * @param {String} type - UPDATE OR DELETE
+ * Edit review
  * @param {String} token - Verification token
- * @param {Object} data - Review data
+ * @param {String} id - Review Id
+ * @property {String} quality - Review quality
+ * @property {String} status - Review status
  */
-export const reviewOperationFetch = (type, token, data) => {
-  const options = {
-    method: '',
-    headers: {
-      'Content-Type': 'application/json',
-      "Authorization": 'Bearer ' + token,
-    },
-    body: JSON.stringify(data),
-  };
-
-  switch (type) {
-    case "ADD":
-      options.method = 'POST';
-      break;
-
-    case "UPDATE":
-      options.method = 'PUT';
-      break;
-
-    case "DELETE":
-      options.method = 'DELETE';
-      break;
-
-    default:
-      options.method = 'GET';
-  }
-
-  return fetch(reviewSerivceUri.commonUrl, options)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else {
-        return Promise.reject(responseErrorHandler(response));
-      }
-    })
-    .catch(err => {
-      return Promise.reject(err);
-    });
-}
-
-/**
- * Vote review
- * @param {String} token - Verification Token
- * @param {String} id - Review id
- * @property {String} uid - User id
- * @property {String} vote - Vote
- * @property {String} businessName - Business name
- * @property {String} businessSlug - Business slug
- */
-export const voteReviewFetch = (token, id, { uid, vote, businessName, businessSlug } = {}) => {
+export const editReviewFetch = (token, id, { quality, status }) => {
   const options = {
     method: 'POST',
     headers: {
@@ -158,17 +90,15 @@ export const voteReviewFetch = (token, id, { uid, vote, businessName, businessSl
       "Authorization": 'Bearer ' + token,
     },
     body: JSON.stringify({
-      uid,
-      vote,
-      businessName,
-      businessSlug,
+      quality,
+      status,
     }),
   };
 
-  return fetch(reviewSerivceUri.voteReviewUrl + id, options)
+  return fetch(reviewSerivceUri.adminUrl + '/' + id, options)
     .then(response => {
       if (response.ok) {
-        return response.json();
+        return response;
       } else {
         return Promise.reject(responseErrorHandler(response));
       }

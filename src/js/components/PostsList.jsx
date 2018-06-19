@@ -133,15 +133,14 @@ class BlogList extends Component {
       this.props.updatePostState(this.state.postId, this.state.state)
         .then(response => {
           if (response) {
-            this.setState({
-              dialogOpen: false
+            this.props.getPostsList({
+              limit: this.state.rowsPerPage,
+              skip: this.state.page * this.state.rowsPerPage,
             });
           }
-        })
-        .then(() => {
-          return this.props.getPostsList({
-            limit: this.state.rowsPerPage,
-            skip: this.state.page * this.state.rowsPerPage,
+
+          this.setState({
+            dialogOpen: false
           });
         });
     }
@@ -241,7 +240,7 @@ class BlogList extends Component {
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
-                    {this.state.content}
+                    <div dangerouslySetInnerHTML={{ __html: this.state.content }} />
                   </Grid>
                 </Grid>
               </DialogContent>

@@ -8,24 +8,9 @@ import * as AlertActions from './alert.actions';
 import { getToken } from '../api/auth.service';
 import { fetchCategoriesOrTags, tagOperationFetch } from '../api/business.service';
 
-const getTagsSuccess = (reponse) => ({
-  "type": tagTypes.GET_TAGS_SUCCESS,
-  "meta": {},
-  "error": null,
-  "payload": {
-    list: reponse,
-  }
-});
-
-const getTagsFailure = (error) => ({
-  "type": tagTypes.GET_TAGS_FAILURE,
-  "meta": {},
-  "error": error,
-  "payload": {}
-});
-
 /**
  * Get business tags list
+ @param {String} search - Search term
  */
 export const getTagsList = (search) => {
   const _getTagsRequest = () => ({
@@ -35,15 +20,31 @@ export const getTagsList = (search) => {
     "payload": {}
   });
 
+  const _getTagsSuccess = (reponse) => ({
+    "type": tagTypes.GET_TAGS_SUCCESS,
+    "meta": {},
+    "error": null,
+    "payload": {
+      list: reponse,
+    }
+  });
+
+  const _getTagsFailure = (error) => ({
+    "type": tagTypes.GET_TAGS_FAILURE,
+    "meta": {},
+    "error": error,
+    "payload": {}
+  });
+
   return (dispatch, getState) => {
     dispatch(_getTagsRequest());
 
     return fetchCategoriesOrTags("TAG", search)
       .then(response => {
-        return dispatch(getTagsSuccess(response));
+        return dispatch(_getTagsSuccess(response));
       })
       .catch(err => {
-        dispatch(getTagsFailure(err));
+        dispatch(_getTagsFailure(err));
         if (err.message)
           dispatch(AlertActions.alertFailure(err.message));
 
@@ -61,9 +62,18 @@ export const getTagsList = (search) => {
  * @property {String} data.enName - Tag enligsh name
  */
 export const addNewTag = (data) => {
-  const _addTagRequest = () => ({
-    "type": tagTypes.ADD_TAG_REQUEST,
-  })
+  const _addNewTagRequest = () => ({
+    "type": tagTypes.ADD_NEW_TAG_REQUEST,
+  });
+
+  const _addNewTagSuccess = () => ({
+    "type": tagTypes.ADD_NEW_TAG_SUCCESS,
+  });
+
+  const _addNewTagFailure = (err) => ({
+    "type": tagTypes.ADD_NEW_TAG_FAILURE,
+    "error": err
+  });
 
   return (dispatch, getState) => {
     if (_.isEmpty(data)
@@ -74,7 +84,7 @@ export const addNewTag = (data) => {
         return dispatch(AlertActions.alertFailure("Bad request"));
     }
 
-    dispatch(_addTagRequest());
+    dispatch(_addNewTagRequest());
 
     return getToken()
       .then(token => {
@@ -82,12 +92,12 @@ export const addNewTag = (data) => {
       })
       .then(response => {
         dispatch(AlertActions.alertSuccess("Added tag successfully"));
-        dispatch(getTagsSuccess(response));
+        dispatch(_addNewTagSuccess());
 
         return response;
       })
       .catch(err => {
-        dispatch(getTagsFailure(err));
+        dispatch(_addNewTagFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;
@@ -107,7 +117,16 @@ export const addNewTag = (data) => {
 export const updateTag = (data) => {
   const _updateTagRequest = () => ({
     "type": tagTypes.UPDATE_TAG_REQUEST,
-  })
+  });
+
+  const _updateTagSuccess = () => ({
+    "type": tagTypes.UPDATE_TAG_SUCCESS,
+  });
+
+  const _updateTagFailure = (err) => ({
+    "type": tagTypes.UPDATE_TAG_FAILURE,
+    "error": err,
+  });
 
   return (dispatch, getState) => {
     if (_.isEmpty(data)
@@ -126,13 +145,13 @@ export const updateTag = (data) => {
         return tagOperationFetch("UPDATE", token, data);
       })
       .then(response => {
+        dispatch(_updateTagSuccess());
         dispatch(AlertActions.alertSuccess("Updated tag successfully"));
-        dispatch(getTagsSuccess(response));
 
         return response;
       })
       .catch(err => {
-        dispatch(getTagsFailure(err));
+        dispatch(_updateTagFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;
@@ -149,6 +168,15 @@ export const deleteTag = (id) => {
     "type": tagTypes.DELETE_TAG_REQUEST,
   });
 
+  const _deleteTagSuccess = () => ({
+    "type": tagTypes.DELETE_TAG_SUCCESS,
+  });
+
+  const _deleteTagFailure = (err) => ({
+    "type": tagTypes.DELETE_TAG_FAILURE,
+    "error": err,
+  });
+
   return (dispatch, getState) => {
     if (_.isUndefined(id)) {
       return dispatch(AlertActions.alertFailure("Code is missing"));
@@ -161,13 +189,13 @@ export const deleteTag = (id) => {
         return tagOperationFetch("DELETE", token, {"_id": id});
       })
       .then(response => {
+        dispatch(_deleteTagSuccess());
         dispatch(AlertActions.alertSuccess("Deleted tag successfully"));
-        dispatch(getTagsSuccess(response));
 
         return response;
       })
       .catch(err => {
-        dispatch(getTagsFailure(err));
+        dispatch(_deleteTagFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;

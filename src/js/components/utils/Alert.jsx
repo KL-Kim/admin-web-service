@@ -28,17 +28,6 @@ const styles = theme => ({
   },
 });
 
-const anchorOrigin = {
-  vertical: 'bottom',
-  horizontal: 'right',
-}
-
-const SnackbarContentProps = {
-  'aria-describedby': 'message-id',
-};
-
-const hideDuration = 3000;
-
 class Alert extends Component {
   constructor(props) {
     super(props);
@@ -81,12 +70,16 @@ class Alert extends Component {
 
     return (
         <Snackbar
-          anchorOrigin={anchorOrigin}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
           open={this.state.open}
-          transition={Fade}
-          autoHideDuration={hideDuration}
+          autoHideDuration={3000}
           onClose={this.handleClose}
-          SnackbarContentProps={SnackbarContentProps}
+          ContentProps={{
+            'aria-describedby': 'message-id',
+          }}
           message={messageContent}
           action={
             <IconButton

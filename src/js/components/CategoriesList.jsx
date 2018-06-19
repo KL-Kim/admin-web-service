@@ -62,7 +62,6 @@ class CategoryList extends Component {
       "AddNewDiaglogOpen": false,
       "confirmationDialogOpen": false,
       "search": '',
-      "list": {},
       "isNew": false,
       "_id": '',
       "code": '',
@@ -84,15 +83,6 @@ class CategoryList extends Component {
 
   componentDidMount() {
     this.props.getCategoriesList();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.categoriesList) {
-      this.setState({
-        list: nextProps.categoriesList
-      });
-    }
-
   }
 
   handleChange(e) {
@@ -126,6 +116,8 @@ class CategoryList extends Component {
     if (this.state._id) {
       this.props.deleteCategory(this.state._id).then(response => {
         if (response) {
+          this.props.getCategoriesList(this.state.search);
+
           this.setState({
             AddNewDiaglogOpen: false,
             confirmationDialogOpen: false,
@@ -176,9 +168,8 @@ class CategoryList extends Component {
 
   handleSearch(e) {
     e.preventDefault();
-    const { search } = this.state;
 
-    this.props.getCategoriesList(search);
+    this.props.getCategoriesList(this.state.search);
   }
 
   handleSubmit() {
@@ -192,6 +183,11 @@ class CategoryList extends Component {
           krName: krName,
           cnName: cnName,
           parent: parent,
+        })
+        .then(response => {
+          if (response) {
+            this.props.getCategoriesList(this.state.search);
+          }
         });
       } else {
         this.props.updateCategory({
@@ -201,6 +197,11 @@ class CategoryList extends Component {
           krName: krName,
           cnName: cnName,
           parent: parent,
+        })
+        .then(response => {
+          if (response) {
+            this.props.getCategoriesList(this.state.search);
+          }
         });
       }
     }
@@ -212,7 +213,7 @@ class CategoryList extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, categoriesList } = this.props;
     const { code, enName, krName, cnName, isNew } = this.state;
 
     return (
@@ -269,9 +270,8 @@ class CategoryList extends Component {
               </TableHead>
               <TableBody>
                 {
-                  _.isEmpty(this.state.list) ? (<TableRow></TableRow>)
-                  : this.state.list.map((c, index) => (
-
+                  _.isEmpty(categoriesList) ? (<TableRow></TableRow>)
+                  : categoriesList.map((c, index) => (
                       <TableRow hover key={index}
                         onClick={e => this.handleRowClick(e, c)}
                       >
@@ -281,7 +281,6 @@ class CategoryList extends Component {
                         <TableCell>{c.enName}</TableCell>
                         <TableCell>{c.parent}</TableCell>
                       </TableRow>
-
                   ))
                 }
               </TableBody>
@@ -333,9 +332,13 @@ class CategoryList extends Component {
                       input={<Input id="parent" />}
                     >
                       <option value="" />
-                        {_.isEmpty(this.state.list) ? '' : this.state.list.map(item => (
-                          <option key={item.code} value={item.code}>{item.krName}</option>
-                        ))}
+                      {
+                        _.isEmpty(categoriesList)
+                          ? ''
+                          : categoriesList.map(item => (
+                              <option key={item.code} value={item.code}>{item.krName}</option>
+                            ))
+                      }
                     </Select>
                   </FormControl>
                 </Grid>
@@ -378,6 +381,8 @@ CategoryList.propTypes = {
   "isFetching": PropTypes.bool.isRequired,
   "getCategoriesList": PropTypes.func.isRequired,
   "addNewCategory": PropTypes.func.isRequired,
+  "updateCategory": PropTypes.func.isRequired,
+  "deleteCategory": PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -388,4 +393,9 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getCategoriesList, addNewCategory, updateCategory, deleteCategory })(withStyles(styles)(CategoryList));
+export default connect(mapStateToProps, {
+  getCategoriesList,
+  addNewCategory,
+  updateCategory,
+  deleteCategory
+})(withStyles(styles)(CategoryList));

@@ -334,7 +334,7 @@ class BusinessImagesModule extends Component {
 
           <Grid item xs={12}>
             <div className={classes.buttonContainer}>
-              <Button raised color="primary"
+              <Button variant="raised" color="primary"
                 className={classes.button}
                 disabled={_.isEmpty(this.props.id) || (_.isEmpty(this.state.thumbnail) && _.isEmpty(this.state.images))}
                 onClick={this.handleSubmit}

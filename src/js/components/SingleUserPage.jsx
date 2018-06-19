@@ -21,7 +21,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 // Custom Components
 import SettingContainer from './layout/SettingContainer';
-import { adminEditUser, adminGetUser } from '../actions/admin.actions.js';
+import { editUser, getSingleUser } from '../actions/admin.actions.js';
 
 const styles = (theme) => ({
   "paper": {
@@ -63,7 +63,7 @@ class SingleUserInfoPage extends Component {
 
   componentDidMount() {
     if (this.state.userId) {
-      this.props.adminGetUser(this.state.userId)
+      this.props.getSingleUser(this.state.userId)
         .then(user => {
           if (user) {
             this.setState({
@@ -92,7 +92,7 @@ class SingleUserInfoPage extends Component {
     if (userStatus) data.userStatus = userStatus;
 
     if (role || userStatus)
-      this.props.adminEditUser(this.state.userId, data);
+      this.props.editUser(this.state.userId, data);
   }
 
   handleCancel() {
@@ -230,4 +230,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { adminEditUser, adminGetUser })(withStyles(styles)(SingleUserInfoPage));
+export default connect(mapStateToProps, { editUser, getSingleUser })(withStyles(styles)(SingleUserInfoPage));

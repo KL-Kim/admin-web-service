@@ -15,7 +15,7 @@ const categoryReducer = (state = initialState, action) => {
 
     // Get business categories
     case categoryTypes.GET_CATEGORY_REQUEST:
-    case categoryTypes.ADD_CATEGORY_REQUEST:
+    case categoryTypes.ADD_NEW_CATEGORY_REQUEST:
     case categoryTypes.UPDATE_CATEGORY_REQUEST:
     case categoryTypes.DELETE_CATEGORY_REQUEST:
       return {
@@ -32,7 +32,20 @@ const categoryReducer = (state = initialState, action) => {
         totalCount: action.payload.list.length,
       };
 
+    case categoryTypes.ADD_NEW_CATEGORY_SUCCESS:
+    case categoryTypes.UPDATE_CATEGORY_SUCCESS:
+    case categoryTypes.DELETE_CATEGORY_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        error: null,
+      }
+
+
     case categoryTypes.GET_CATEGORY_FAILURE:
+    case categoryTypes.ADD_NEW_CATEGORY_FAILURE:
+    case categoryTypes.UPDATE_CATEGORY_FAILURE:
+    case categoryTypes.DELETE_CATEGORY_FAILURE:
       return {
         ...state,
         isFetching: false,

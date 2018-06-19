@@ -210,7 +210,7 @@ export const deletePostFetch = (token, id, { authorId } = {}) => {
  * @param {String} id - Post id
  * @param {String} state - Post state
  */
-export const updatePostStateFetch = (token, id, state) => {
+export const editPostStateFetch = (token, id, state) => {
   const options = {
     method: 'PUT',
     headers: {

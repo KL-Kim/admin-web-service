@@ -61,7 +61,6 @@ class TagsList extends Component {
       "AddNewDiaglogOpen": false,
       "confirmationDialogOpen": false,
       "search": '',
-      "list": {},
       "isNew": false,
       "_id": '',
       "code": '',
@@ -70,8 +69,8 @@ class TagsList extends Component {
       "cnName": '',
     };
 
-    this.handleAddNew = this.handleAddNew.bind(this);
-    this.handleDialogClose = this.handleDialogClose.bind(this);
+    this.handleAddNewDialogOpen = this.handleAddNewDialogOpen.bind(this);
+    this.handleAddNewDialogClose = this.handleAddNewDialogClose.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleOpenDeleteDialog = this.handleOpenDeleteDialog.bind(this);
@@ -82,15 +81,6 @@ class TagsList extends Component {
 
   componentDidMount() {
     this.props.getTagsList();
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.tagsList) {
-      this.setState({
-        list: nextProps.tagsList
-      });
-    }
-
   }
 
   handleChange(e) {
@@ -108,7 +98,7 @@ class TagsList extends Component {
     });
   }
 
-  handleAddNew() {
+  handleAddNewDialogOpen() {
     this.setState({
       "AddNewDiaglogOpen": true,
       "isNew": true,
@@ -120,7 +110,7 @@ class TagsList extends Component {
     });
   }
 
-  handleDialogClose() {
+  handleAddNewDialogClose() {
     this.setState({
       AddNewDiaglogOpen: false,
       "isNew": false,
@@ -155,6 +145,10 @@ class TagsList extends Component {
           enName: enName,
           krName: krName,
           cnName: cnName,
+        }).then(response => {
+          if (response) {
+            this.props.getTagsList(this.state.search);
+          }
         });
       } else {
         this.props.updateTag({
@@ -163,7 +157,11 @@ class TagsList extends Component {
           enName: enName,
           krName: krName,
           cnName: cnName,
-        })
+        }).then(response => {
+          if (response) {
+            this.props.getTagsList(this.state.search);
+          }
+        });
       }
     }
 
@@ -181,25 +179,28 @@ class TagsList extends Component {
 
   handleDelete() {
     if (this.state._id) {
-      this.props.deleteTag(this.state._id).then(response => {
-        if (response) {
-          this.setState({
-            AddNewDiaglogOpen: false,
-            confirmationDialogOpen: false,
-            "isNew": false,
-            "_id": '',
-            "code": '',
-            "enName": '',
-            "krName": '',
-            "cnName": '',
-          });
-        }
+      this.props.deleteTag(this.state._id)
+        .then(response => {
+          if (response) {
+            this.props.getTagsList(this.state.search);
+
+            this.setState({
+              AddNewDiaglogOpen: false,
+              confirmationDialogOpen: false,
+              "isNew": false,
+              "_id": '',
+              "code": '',
+              "enName": '',
+              "krName": '',
+              "cnName": '',
+            });
+          }
       });
     }
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, tagsList } = this.props;
     const { code, enName, krName, cnName, isNew } = this.state;
 
     return (
@@ -236,7 +237,7 @@ class TagsList extends Component {
             </Grid>
             <Grid item xs={8}>
               <div className={classes.buttonContainer}>
-                <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNew}>
+                <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNewDialogOpen}>
                   Add New
                 </Button>
               </div>
@@ -255,8 +256,8 @@ class TagsList extends Component {
               </TableHead>
               <TableBody>
                 {
-                  _.isEmpty(this.state.list) ? (<TableRow></TableRow>)
-                  : this.state.list.map((c, index) => (
+                  _.isEmpty(tagsList) ? (<TableRow></TableRow>)
+                  : tagsList.map((c, index) => (
 
                       <TableRow hover key={index}
                         onClick={event => this.handleRowClick(event, c)}
@@ -266,7 +267,6 @@ class TagsList extends Component {
                         <TableCell>{c.cnName}</TableCell>
                         <TableCell>{c.enName}</TableCell>
                       </TableRow>
-
                   ))
                 }
               </TableBody>
@@ -275,7 +275,7 @@ class TagsList extends Component {
 
           <Dialog
             open={this.state.AddNewDiaglogOpen}
-            onClose={this.handleDialogClose}
+            onClose={this.handleAddNewDialogClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
@@ -314,7 +314,7 @@ class TagsList extends Component {
               <Button variant="raised" autoFocus color="primary" disabled={!(code && enName && krName && cnName)} onClick={this.handleSubmit}>
                 Save
               </Button>
-              <Button color="primary" onClick={this.handleDialogClose}>
+              <Button color="primary" onClick={this.handleAddNewDialogClose}>
                 Cancel
               </Button>
             </DialogActions>

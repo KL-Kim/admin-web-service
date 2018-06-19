@@ -7,13 +7,13 @@ import alertTypes from '../constants/alert.types';
 /**
  *  Alert success
  */
-export const alertSuccess = response => ({
+export const alertSuccess = message => ({
   "type": alertTypes.ALERT_SUCCESS,
   "meta": {},
   "error": null,
   "payload": {
     "id": uuidv4(),
-    "message": response
+    "message": message
   }
 });
 

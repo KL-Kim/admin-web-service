@@ -15,9 +15,8 @@ const authServiceUri = {
   loginUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/login',
   logoutUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/logout',
   getNewTokenUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/token',
-  sendEmailVerificationUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/mail/verify',
-  sendChangePasswordEmailUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/mail/password',
   sendPhoneVerificationCodeUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/phoneVerificationCode',
+  emailUrl: config.API_GATEWAY_ROOT + '/api/v1/auth/email',
 };
 
 /**
@@ -156,46 +155,6 @@ export const logoutFetch = () => {
 };
 
 /**
- * Request sending changing password email
- * @param {String} type - Email type
- * @param {String} email - User's email
- */
-export const requestSendEmailFetch = (type, email) => {
-  const options = {
-    "method": 'GET',
-    "headers": {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  let url;
-
-  switch (type) {
-    case emailTypes.CHANGE_PASSWORD:
-      url = authServiceUri.sendChangePasswordEmailUrl
-      break;
-
-    case emailTypes.ACCOUNT_VERIFICATION:
-      url = authServiceUri.sendEmailVerificationUrl
-      break;
-
-    default:
-      return Promise.reject(new Error("Type missing"));
-  }
-
-  return fetch(url + '/' + email, options)
-    .then(response => {
-      if (response.ok) {
-        return response;
-      } else {
-        return Promise.reject(responseErrorHandler(response));
-      }
-    }).catch(err => {
-      return Promise.reject(err);
-    });
-};
-
-/**
  * Request sending phone verification code
  * @param {String} phoneNumber - Phone number
  */
@@ -216,6 +175,33 @@ export const requestSendPhoneVerificationCodeFetch = (phoneNumber) => {
       }
     })
     .catch(err => {
+      return Promise.reject(err);
+    });
+};
+
+/**
+ * Request sending email
+ * @param {String} type - Email type
+ * @param {String} email - User's email
+ */
+export const requestSendEmailFetch = (type, email) => {
+  const options = {
+    "method": 'GET',
+    "headers": {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  let url = authServiceUri.emailUrl;
+
+  return fetch(url, options)
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        return Promise.reject(responseErrorHandler(response));
+      }
+    }).catch(err => {
       return Promise.reject(err);
     });
 };

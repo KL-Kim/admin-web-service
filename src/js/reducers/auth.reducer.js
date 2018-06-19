@@ -16,7 +16,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         "isFetching": true,
         "error": null,
-      }
+      };
+      
     case authTypes.SEND_PHONE_VERIFICATION_CODE_SUCCESS:
       return {
         ...state,

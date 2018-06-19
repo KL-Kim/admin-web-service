@@ -1,4 +1,4 @@
-DISSOLUTEimport React, { Component } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -136,6 +136,7 @@ class SingleBusinessPage extends Component {
     super(props);
 
     this.state = {
+      "_id": '',
       "priority": 0,
       "category": {
         _id: '',
@@ -200,7 +201,8 @@ class SingleBusinessPage extends Component {
       imagesUri: [],
     }
 
-    this.state._id = _.isUndefined(this.props.location.state.businessId) ? '' : this.props.location.state.businessId;
+    this.state._id = '';
+    this.state.slug = props.match.params.slug === 'new' ? '' : props.match.params.slug;
     this.state.search = '';
     this.state.addMenuDialogOpen = false;
     this.state.menuIndex = null;
@@ -220,8 +222,8 @@ class SingleBusinessPage extends Component {
     this.handleChangeCategory = this.handleChangeCategory.bind(this);
     this.handleChangeAddress = this.handleChangeAddress.bind(this);
     this.handleChangeOpenningSpec = this.handleChangeOpenningSpec.bind(this);
-    this.handleOpenSubDepartmentsDialog = this.handleOpenSubDepartmentsDialog.bind(this);
-    this.handleCloseSubDepartmentsDialog = this.handleCloseSubDepartmentsDialog.bind(this);
+    this.handleOpenChainsDialog = this.handleOpenChainsDialog.bind(this);
+    this.handleCloseChainsDialog = this.handleCloseChainsDialog.bind(this);
     this.handleOpenAddMenuDialog = this.handleOpenAddMenuDialog.bind(this);
     this.handleCloseAddMenuDialog = this.handleCloseAddMenuDialog.bind(this);
     this.handleAddNewMenu = this.handleAddNewMenu.bind(this);
@@ -251,85 +253,87 @@ class SingleBusinessPage extends Component {
       this.props.getTagsList();
     }
 
-    if (this.state._id)
-      this.props.getSingleBusiness("id", this.state._id, this.props.admin._id).then(business => {
-        if (_.isEmpty(business)) return ;
-
-        this.setState({
-          "category": {
-            _id: _.isEmpty(business.category) ? '' : business.category._id,
-            code: _.isEmpty(business.category) ? '' : business.category.code || '',
-            krName: _.isEmpty(business.category) ? '' : business.category.krName || '',
-            cnName: _.isEmpty(business.category) ? '' : business.category.cnName || '',
-            enName: _.isEmpty(business.category) ? '' : business.category.enName || '',
-          },
-          priority: business.priority || 0,
-          businessState: business.businessState || '',
-          cnName: business.cnName || '',
-          krName: business.krName || '',
-          enName: business.enName || '',
-          tel: business.tel || '',
-          priceRange: business.priceRange || '',
-          supportedLanguage: business.supportedLanguage || '',
-          payment: business.payment || '',
-          delivery: business.delivery || '',
-          status: business.status || '',
-          "address": {
-            province: {
-              name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.name || '')),
-              code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.code || '')),
-            },
-            city: {
-              name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.name || '')),
-              code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.code || '')),
-            },
-            area: {
-              name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.name || '')),
-              code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.code || '')),
-            },
-            street:  _.isEmpty(business.address) ? '' : (business.address.street || ''),
-          },
-          "geo": {
-            lat:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[0] || 0),
-            long:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[1] || 0),
-          },
-          "openningHoursSpec": {
-            mon: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.mon || ''),
-            tue: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.tue || ''),
-            wed: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.wed || ''),
-            thu: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.thu || ''),
-            fri: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.fri || ''),
-            sat: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sat || ''),
-            sun: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sun || ''),
-          },
-          rest: business.rest || '',
-          chains: _.isEmpty(business.chains) ? [] : business.chains.slice(),
-          description: business.description || '',
-          "viewsCount": business.viewsCount,
-          weekViewsCount: business.weekViewsCount || 0,
-          monthViewsCount: business.monthViewsCount || 0,
-          favoredCount: business.favoredCount || 0,
-          reviewsCount: _.isEmpty(business.reviewsList) ? 0 : business.reviewsList.length,
-          event: business.event || null,
-          menu: _.isEmpty(business.menu) ? [] : business.menu.slice(),
-          reports: _.isEmpty(business.reports) ? [] : business.reports.slice(),
-          thumbnailUri: {
-            "default": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.default,
-            "hd": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.hd,
-          },
-          imagesUri: _.isEmpty(business.imagesUri) ? [] : business.imagesUri.slice(),
-        });
-
-        if (!_.isEmpty(business.tags)) {
-          let tags = [];
-
-          business.tags.map(tag => tags.push(tag.krName));
+    if (this.state.slug)
+      this.props.getSingleBusiness(this.state.slug)
+        .then(business => {
+          if (_.isEmpty(business)) return ;
 
           this.setState({
-            tags: tags.slice()
+            _id: business._id,
+            "category": {
+              _id: _.isEmpty(business.category) ? '' : business.category._id,
+              code: _.isEmpty(business.category) ? '' : business.category.code || '',
+              krName: _.isEmpty(business.category) ? '' : business.category.krName || '',
+              cnName: _.isEmpty(business.category) ? '' : business.category.cnName || '',
+              enName: _.isEmpty(business.category) ? '' : business.category.enName || '',
+            },
+            priority: business.priority || 0,
+            businessState: business.businessState || '',
+            cnName: business.cnName || '',
+            krName: business.krName || '',
+            enName: business.enName || '',
+            tel: business.tel || '',
+            priceRange: business.priceRange || '',
+            supportedLanguage: business.supportedLanguage || '',
+            payment: business.payment || '',
+            delivery: business.delivery || '',
+            status: business.status || '',
+            "address": {
+              province: {
+                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.name || '')),
+                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.code || '')),
+              },
+              city: {
+                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.name || '')),
+                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.code || '')),
+              },
+              area: {
+                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.name || '')),
+                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.code || '')),
+              },
+              street:  _.isEmpty(business.address) ? '' : (business.address.street || ''),
+            },
+            "geo": {
+              lat:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[0] || 0),
+              long:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[1] || 0),
+            },
+            "openningHoursSpec": {
+              mon: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.mon || ''),
+              tue: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.tue || ''),
+              wed: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.wed || ''),
+              thu: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.thu || ''),
+              fri: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.fri || ''),
+              sat: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sat || ''),
+              sun: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sun || ''),
+            },
+            rest: business.rest || '',
+            chains: _.isEmpty(business.chains) ? [] : business.chains.slice(),
+            description: business.description || '',
+            "viewsCount": business.viewsCount,
+            weekViewsCount: business.weekViewsCount || 0,
+            monthViewsCount: business.monthViewsCount || 0,
+            favoredCount: business.favoredCount || 0,
+            reviewsCount: _.isEmpty(business.reviewsList) ? 0 : business.reviewsList.length,
+            event: business.event || null,
+            menu: _.isEmpty(business.menu) ? [] : business.menu.slice(),
+            reports: _.isEmpty(business.reports) ? [] : business.reports.slice(),
+            thumbnailUri: {
+              "default": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.default,
+              "hd": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.hd,
+            },
+            imagesUri: _.isEmpty(business.imagesUri) ? [] : business.imagesUri.slice(),
           });
-        }
-      });
+
+          if (!_.isEmpty(business.tags)) {
+            let tags = [];
+
+            business.tags.map(tag => tags.push(tag.krName));
+
+            this.setState({
+              tags: tags.slice()
+            });
+          }
+        });
   }
 
   handleChange(e) {
@@ -343,17 +347,16 @@ class SingleBusinessPage extends Component {
   handleChangeCategory(e) {
     const { name, value } = e.target;
 
-    if (name === 'category') {
-      this.setState({
-        "category": {
-          _id: value._id,
-          code: value.code,
-          krName: value.krName,
-          cnName: value.cnName,
-          enName: value.enName,
-        }
-      });
-    }
+    this.setState({
+      "category": {
+        _id: value._id,
+        code: value.code,
+        krName: value.krName,
+        cnName: value.cnName,
+        enName: value.enName,
+      }
+    });
+
   }
 
   handleChangeAddress(e) {
@@ -522,13 +525,13 @@ class SingleBusinessPage extends Component {
 
   handleEventEditorChange = (editorState) => this.setState({ event: editorState });
 
-  handleOpenSubDepartmentsDialog() {
+  handleOpenChainsDialog() {
     this.setState({
       chainDialogOpen: true,
     });
   }
 
-  handleCloseSubDepartmentsDialog() {
+  handleCloseChainsDialog() {
     this.setState({
       chainDialogOpen: false,
     });
@@ -707,6 +710,8 @@ class SingleBusinessPage extends Component {
   }
 
   handleSubmit(e) {
+    e.preventDefault();
+
     if (this.state.krName
       && this.state.cnName
       && this.state.enName
@@ -803,8 +808,7 @@ class SingleBusinessPage extends Component {
       }
 
       if (this.state._id) {
-        data._id = this.state._id;
-        this.props.updateBusiness(data);
+        this.props.updateBusiness(this.state._id, data);
       } else {
         this.props.addBusiness(data);
       }
@@ -838,12 +842,18 @@ class SingleBusinessPage extends Component {
                   >
                     Delete
                   </Button>
-                  <Link to={'/business/s/' + this.state.enName}>
+                  <Link to={{
+                      pathname: '/business/sample/' + this.state.enName,
+                      state: {
+                        admin: this.props.admin
+                      }
+                    }}
+                  >
                     <Button color="primary" className={classes.button}>
-                      View Page
+                      View Sample
                     </Button>
                   </Link>
-                  <Button raised color="primary" className={classes.button}
+                  <Button variant="raised" color="primary" className={classes.button}
                     onClick={this.handleSubmit}
                     disabled={
                       _.isEmpty(this.state.krName)
@@ -903,12 +913,12 @@ class SingleBusinessPage extends Component {
                 <Paper className={classes.paper}>
                   <Grid container alignItems="center">
                     <Grid item xs={6}>
-                      <Typography variant="title">Chain</Typography>
+                      <Typography variant="title">Chains</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                       <div className={classes.buttonContainer}>
-                        <IconButton color="default" onClick={this.handleOpenSubDepartmentsDialog}>
+                        <IconButton color="default" onClick={this.handleOpenChainsDialog}>
                           <AddCircleOutline />
                         </IconButton>
                       </div>
@@ -1504,7 +1514,7 @@ class SingleBusinessPage extends Component {
 
             <Dialog fullWidth
               open={this.state.chainDialogOpen}
-              onClose={this.handleCloseSubDepartmentsDialog}
+              onClose={this.handleCloseChainsDialog}
               aria-labelledby="sd-dialog-title"
               aria-describedby="sd-dialog-description"
             >
@@ -1572,7 +1582,7 @@ class SingleBusinessPage extends Component {
 
               </DialogContent>
               <DialogActions>
-                <Button color="primary" onClick={this.handleCloseSubDepartmentsDialog}>
+                <Button color="primary" onClick={this.handleCloseChainsDialog}>
                   Close
                 </Button>
               </DialogActions>
@@ -1717,6 +1727,7 @@ const mapStateToProps = (state, ownProps) => {
     "areas": state.pcaReducer.areas,
     "businessList": state.businessReducer.businessList,
     "isFetching": state.businessReducer.isFetching,
+    "business": state.businessReducer.business,
   };
 };
 

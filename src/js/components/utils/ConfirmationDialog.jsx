@@ -48,7 +48,7 @@ class ConfirmationDialog extends Component {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color="primary" raised onClick={this.handleSubmit} className={classes.button}>
+          <Button color="primary" variant="raised" onClick={this.handleSubmit} className={classes.button}>
             Ok
           </Button>
           <Button color="primary" onClick={this.props.handleClose} className={classes.button}>

@@ -47,7 +47,7 @@ import TablePaginationActions from './utils/TablePaginationActions';
 // Actions
 import {
   getComments,
-  updateCommentStatus,
+  editComment,
   clearCommentsList
 } from '../actions/comment.actions';
 
@@ -164,13 +164,15 @@ class CommentsList extends Component {
 
   handleSubmit() {
     if (this.state.commentId) {
-      this.props.updateCommentStatus(this.state.commentId, this.state.status)
+      this.props.editComment(this.state.commentId, this.state.status)
         .then(response => {
-          return this.props.getComments({
-            skip: this.state.page * this.state.rowsPerPage,
-            limit: this.state.rowsPerPage,
-            status: this.state.listStatus,
-          });
+          if (response) {
+            return this.props.getComments({
+              skip: this.state.page * this.state.rowsPerPage,
+              limit: this.state.rowsPerPage,
+              status: this.state.listStatus,
+            });
+          }
         })
         .then(response => {
           this.setState({
@@ -331,4 +333,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getComments, updateCommentStatus, clearCommentsList })(withStyles(styles)(CommentsList));
+export default connect(mapStateToProps, { getComments, editComment, clearCommentsList })(withStyles(styles)(CommentsList));

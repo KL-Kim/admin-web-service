@@ -7,9 +7,6 @@ import _ from 'lodash';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
-// Actions
-import { getSingleReview } from '../../actions/review.actions';
-
 const styles = theme => ({
 });
 
@@ -117,4 +114,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getSingleReview })(withStyles(styles)(MessageContent));
+export default connect(mapStateToProps, {})(withStyles(styles)(MessageContent));

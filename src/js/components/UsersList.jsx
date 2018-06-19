@@ -42,7 +42,7 @@ import LinkContainer from './utils/LinkContainer';
 import TablePaginationActions from './utils/TablePaginationActions';
 
 // Actions
-import { getUsersList, adminEditUser } from '../actions/admin.actions.js';
+import { getUsersList } from '../actions/admin.actions.js';
 
 const styles = (theme) => ({});
 
@@ -51,8 +51,6 @@ class UsersList extends Component {
     super(props);
 
     this.state = {
-      "users": null,
-      "totalCount": 0,
       "rowsPerPage": 20,
       "page": 0,
       "search": '',
@@ -71,21 +69,7 @@ class UsersList extends Component {
   componentDidMount() {
     this.props.getUsersList({
       limit: this.state.rowsPerPage,
-    })
-    .then(response => {
-      if (response.users) {
-        this.setState({
-          users: response.users,
-          totalCount: response.totalCount,
-        });
-      }
     });
-  }
-
-  componentWillReceiveProps(nextProps, nextState) {
-    if (_.isEmpty(nextProps.admin) && (nextProps.admin.role !== 'admin')) {
-      this.props.history.push('/404');
-    }
   }
 
   handleChange(e) {
@@ -99,31 +83,37 @@ class UsersList extends Component {
   handlePaginationChange(e, page) {
     this.props.getUsersList({
       skip: page * this.state.rowsPerPage,
-      limit: this.state.rowsPerPage
-    }).then(response => {
-        if (response.users) {
-          this.setState({
-            page: page,
-            users: response.users,
-            totalCount: response.totalCount,
-          });
-        }
-      });
+      limit: this.state.rowsPerPage,
+      role: this.state.role,
+      status: this.state.status,
+      search: this.state.search,
+    })
+    .then(response => {
+      if (response.users) {
+        this.setState({
+          page: page,
+        });
+      }
+    });
   }
 
   handleChangeRowsPerPage(e) {
+    const { value } = e.target;
+
     this.props.getUsersList({
       skip: this.state.page * e.target.value,
-      limit: e.target.value
-    }).then(response => {
-        if (response.users) {
-          this.setState({
-            rowsPerPage: e.target.value,
-            users: response.users,
-            totalCount: response.totalCount,
-          });
-        }
-      });
+      limit: value,
+      role: this.state.role,
+      status: this.state.status,
+      search: this.state.search,
+    })
+    .then(response => {
+      if (response.users) {
+        this.setState({
+          rowsPerPage: value,
+        });
+      }
+    });
   }
 
   handleFilterRole(e) {
@@ -140,8 +130,6 @@ class UsersList extends Component {
       if (response.users) {
         this.setState({
           role: value,
-          users: response.users,
-          totalCount: response.totalCount,
         });
       }
     });
@@ -161,8 +149,6 @@ class UsersList extends Component {
       if (response.users) {
         this.setState({
           status: value,
-          users: response.users,
-          totalCount: response.totalCount,
         });
       }
     });
@@ -176,19 +162,11 @@ class UsersList extends Component {
       role: this.state.role,
       status: this.state.status,
       search: this.state.search
-    })
-    .then(response => {
-      if (response.users) {
-        this.setState({
-          users: response.users,
-          totalCount: response.totalCount,
-        });
-      }
     });
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, usersList } = this.props;
 
     return (
       <SettingContainer>
@@ -273,8 +251,9 @@ class UsersList extends Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                { _.isEmpty(this.state.users) ? (<TableRow></TableRow>)
-                  : this.state.users.map((user, index) => (
+                { _.isEmpty(usersList)
+                  ? (<TableRow></TableRow>)
+                  : usersList.map((user, index) => (
                     <LinkContainer to={{
                         pathname: "/user/s/" + user.username,
                         state: {
@@ -297,7 +276,7 @@ class UsersList extends Component {
               <TableFooter>
                 <TableRow>
                   <TablePagination
-                    count={this.state.totalCount}
+                    count={this.props.totalCount}
                     rowsPerPage={this.state.rowsPerPage}
                     rowsPerPageOptions={[10, 20, 30]}
                     page={this.state.page}
@@ -317,13 +296,19 @@ class UsersList extends Component {
 
 UsersList.propTypes = {
   "classes": PropTypes.object.isRequired,
-  "admin": PropTypes.object,
+  "admin": PropTypes.object.isRequired,
+  "isFetching": PropTypes.bool.isRequired,
+  "usersList": PropTypes.array.isRequired,
+  "total": PropTypes.number.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
   return {
     "admin": state.userReducer.user,
+    "isFetching": state.userReducer.isFetching,
+    "usersList": state.userReducer.list,
+    "totalCount": state.userReducer.totalCount,
   };
 };
 
-export default connect(mapStateToProps, { getUsersList, adminEditUser })(withStyles(styles)(UsersList));
+export default connect(mapStateToProps, { getUsersList })(withStyles(styles)(UsersList));

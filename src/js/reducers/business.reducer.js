@@ -4,6 +4,7 @@
 import businessTypes from '../constants/business.types';
 
 const initialState = {
+  business: {},
   businessList: [],
   totalCount: 0,
   isFetching: false,
@@ -12,7 +13,7 @@ const initialState = {
 
 const businessReducer = (state = initialState, action) => {
   switch (action.type) {
-    // Clear busines reduer
+    // Clear business reduer
     case businessTypes.CLEAR_BUSINESS_LIST:
       return initialState;
 
@@ -54,6 +55,12 @@ const businessReducer = (state = initialState, action) => {
       };
 
     case businessTypes.GET_SINGLE_BUSINESS_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        business: action.payload.business,
+      };
+
     case businessTypes.ADD_BUSINESS_SUCCESS:
     case businessTypes.UPDATE_BUSINESS_SUCCESS:
     case businessTypes.UPLOAD_IMAGES_SUCCESS:

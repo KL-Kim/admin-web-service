@@ -8,27 +8,7 @@ import * as AlertActions from './alert.actions';
 import { getToken } from '../api/auth.service';
 import { fetchCategoriesOrTags, categoryOperationFetch } from '../api/business.service';
 
-/**
- * Get categories list successfully
- */
-const getCategoriesSuccess = (reponse) => ({
-  "type": categoryTypes.GET_CATEGORY_SUCCESS,
-  "meta": {},
-  "error": null,
-  "payload": {
-    list: reponse
-  }
-});
 
-/**
- * Get categories list failed
- */
-const getCategoriesFailure = (error) => ({
-  "type": categoryTypes.GET_CATEGORY_FAILURE,
-  "meta": {},
-  "error": error,
-  "payload": {}
-});
 
 /**
  * Get business categories list
@@ -39,15 +19,37 @@ export const getCategoriesList = (search) => {
     "type": categoryTypes.GET_CATEGORY_REQUEST,
   });
 
+  /**
+   * Get categories list successfully
+   */
+  const _getCategoriesSuccess = (reponse) => ({
+    "type": categoryTypes.GET_CATEGORY_SUCCESS,
+    "meta": {},
+    "error": null,
+    "payload": {
+      list: reponse
+    }
+  });
+
+  /**
+   * Get categories list failed
+   */
+  const _getCategoriesFailure = (error) => ({
+    "type": categoryTypes.GET_CATEGORY_FAILURE,
+    "meta": {},
+    "error": error,
+    "payload": {}
+  });
+
   return (dispatch, getState) => {
     dispatch(_getCategoriesRequest());
 
     return fetchCategoriesOrTags("CATAGORY", search)
       .then(response => {
-        return dispatch(getCategoriesSuccess(response));
+        return dispatch(_getCategoriesSuccess(response));
       })
       .catch(err => {
-        dispatch(getCategoriesFailure(err));
+        dispatch(_getCategoriesFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;
@@ -65,7 +67,19 @@ export const getCategoriesList = (search) => {
  */
 export const addNewCategory = (data) => {
   const _addNewCategoryRequest = () => ({
-    "type": categoryTypes.ADD_CATEGORY_REQUEST,
+    "type": categoryTypes.ADD_NEW_CATEGORY_REQUEST,
+  });
+
+  const _addNewCategorySuccess = () => ({
+    "type": categoryTypes.ADD_NEW_CATEGORY_SUCCESS,
+    "meta": {},
+    "error": null,
+    "payload": {},
+  });
+
+  const _addNewCategoryFailure = (err) => ({
+    "type": categoryTypes.ADD_NEW_CATEGORY_FAILURE,
+    "error": err
   });
 
   return (dispatch, getState) => {
@@ -85,12 +99,12 @@ export const addNewCategory = (data) => {
       })
       .then(response => {
         dispatch(AlertActions.alertSuccess("Added new category successfully"));
-        dispatch(getCategoriesSuccess(response));
+        dispatch(_addNewCategorySuccess());
 
         return response;
       })
       .catch(err => {
-        dispatch(getCategoriesFailure(err));
+        dispatch(_addNewCategoryFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;
@@ -111,7 +125,16 @@ export const addNewCategory = (data) => {
 export const updateCategory = (data) => {
   const _updateCategoryRequest = () => ({
     "type": categoryTypes.UPDATE_CATEGORY_REQUEST,
-  })
+  });
+
+  const _updateCategorySuccess = () => ({
+    "type": categoryTypes.UPDATE_CATEGORY_SUCCESS,
+  });
+
+  const _updateCategoryFailure = (err) => ({
+    "type": categoryTypes.UPDATE_CATEGORY_FAILURE,
+    "error": err
+  });
 
   return (dispatch, getState) => {
     if (_.isEmpty(data)
@@ -131,12 +154,12 @@ export const updateCategory = (data) => {
       })
       .then(response => {
         dispatch(AlertActions.alertSuccess("Update category successfully"));
-        dispatch(getCategoriesSuccess(response));
+        dispatch(_updateCategorySuccess(response));
 
         return response;
       })
       .catch(err => {
-        dispatch(getCategoriesFailure(err));
+        dispatch(_updateCategoryFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;
@@ -153,6 +176,16 @@ export const deleteCategory = (id) => {
     "type": categoryTypes.DELETE_CATEGORY_REQUEST,
   });
 
+  const _deleteCategorySuccess = () => ({
+    "type": categoryTypes.DELETE_CATEGORY_SUCCESS,
+    "payload": {},
+  });
+
+  const _deleteCategoryFailure = (err) => ({
+    "type": categoryTypes.DELETE_CATEGORY_FAILURE,
+    "error": err,
+  });
+
   return (dispatch, getState) => {
     if (_.isUndefined(id)) {
       return dispatch(AlertActions.alertFailure("Code is missing"));
@@ -165,13 +198,13 @@ export const deleteCategory = (id) => {
         return categoryOperationFetch("DELETE", token, {"_id": id});
       })
       .then(response => {
+        dispatch(_deleteCategorySuccess());
         dispatch(AlertActions.alertSuccess("Delete category successfully"));
-        dispatch(getCategoriesSuccess(response));
 
         return response;
       })
       .catch(err => {
-        dispatch(getCategoriesFailure(err));
+        dispatch(_deleteCategoryFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
 
         return ;

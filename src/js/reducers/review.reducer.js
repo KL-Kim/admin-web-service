@@ -18,10 +18,7 @@ const reviewReducer = (state = initialState, action) => {
 
     // Request
     case reviewTypes.GET_REVIEWS_REQUEST:
-    case reviewTypes.ADD_NEW_REVIEW_REQUEST:
-    case reviewTypes.UPDATE_REVIEW_REQUEST:
-    case reviewTypes.DELETE_REVIEW_REQUEST:
-    case reviewTypes.VOTE_REVIEW_REQUEST:
+    case reviewTypes.EDIT_REVIEW_REQUEST:
       return {
         ...state,
         isFetching: true,
@@ -29,10 +26,7 @@ const reviewReducer = (state = initialState, action) => {
       };
 
     case reviewTypes.GET_REVIEWS_FAILURE:
-    case reviewTypes.ADD_NEW_REVIEW_FAILURE:
-    case reviewTypes.UPDATE_REVIEW_FAILURE:
-    case reviewTypes.DELETE_REVIEW_FAILURE:
-    case reviewTypes.VOTE_REVIEW_FAILURE:
+    case reviewTypes.EDIT_REVIEW_FAILURE:
       return {
         ...state,
         isFetching: false,
@@ -40,9 +34,6 @@ const reviewReducer = (state = initialState, action) => {
       };
 
     case reviewTypes.GET_REVIEWS_SUCCESS:
-    case reviewTypes.ADD_NEW_REVIEW_SUCCESS:
-    case reviewTypes.UPDATE_REVIEW_SUCCESS:
-    case reviewTypes.DELETE_REVIEW_SUCCESS:
       return {
         ...state,
         isFetching: false,
@@ -50,7 +41,7 @@ const reviewReducer = (state = initialState, action) => {
         totalCount: action.payload.totalCount,
       };
 
-    case reviewTypes.VOTE_REVIEW_SUCCESS:
+    case reviewTypes.EDIT_REVIEW_SUCCESS:
       return {
         ...state,
         isFetching: false,

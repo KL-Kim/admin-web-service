@@ -42,7 +42,7 @@ import ProperName from './utils/ProperName';
 import TablePaginationActions from './utils/TablePaginationActions';
 
 // Actions
-import { getReviews, clearReviewsList, updateReview } from '../actions/review.actions';
+import { getReviews, clearReviewsList, editReview } from '../actions/review.actions';
 
 const Quality = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -77,13 +77,10 @@ class ReviewsList extends Component {
   }
 
   componentDidMount() {
-    this.props.getReviews(0, this.state.rowsPerPage, {
-      "orderBy": "new"
+    this.props.getReviews({
+      limit: this.state.rowsPerPage,
+      orderBy: "new",
     });
-  }
-
-  componentWillUnmount() {
-    this.props.clearReviewsList();
   }
 
   handleChange(e) {
@@ -108,20 +105,27 @@ class ReviewsList extends Component {
   }
 
   handlePaginationChange(e, page) {
-    this.props.getReviews(page * this.state.rowsPerPage, this.state.rowsPerPage, {
-      "orderBy": "new"
-    }, this.state.search)
-      .then(response => {
-        this.setState({
-          page: page,
-        });
+    this.props.getReviews({
+      skip: page * this.state.rowsPerPage,
+      limit: this.state.rowsPerPage,
+      search: this.state.search,
+      "orderBy": "new",
+    })
+    .then(response => {
+      this.setState({
+        page: page,
       });
+    });
   }
 
   handleChangeRowsPerPage(e) {
-    this.props.getReviews(this.state.page * e.target.value, e.target.value, {
-      "orderBy": "new"
-    }, this.state.search).then(response => {
+    this.props.getReviews({
+      skip: this.state.page * e.target.value,
+      limit: e.target.value,
+      search: this.state.search,
+      "orderBy": "new",
+    })
+    .then(response => {
       if (response) {
         this.setState({
           rowsPerPage: e.target.value,
@@ -133,9 +137,12 @@ class ReviewsList extends Component {
   handleSearch(e) {
     e.preventDefault();
 
-    this.props.getReviews(this.state.page * this.state.rowsPerPage, this.state.rowsPerPage, {
-      "orderBy": "new"
-    }, this.state.search);
+    this.props.getReviews({
+      skip: this.state.page * this.state.rowsPerPage,
+      limit: this.state.rowsPerPage,
+      search: this.state.search,
+      "orderBy": "new",
+    });
   }
 
   handleDialogClose() {
@@ -145,12 +152,20 @@ class ReviewsList extends Component {
   }
 
   handleSubmit() {
-    this.props.updateReview({
-      _id: this.state.reviewId,
-      uid: this.props.admin._id,
+    this.props.editReview(this.state.reviewId, {
       quality: this.state.quality,
       status: this.state.status,
-    }).then(response => {
+    })
+    .then(response => {
+      if (response) {
+        this.props.getReviews({
+          skip: this.state.page * this.state.rowsPerPage,
+          limit: this.state.rowsPerPage,
+          search: this.state.search,
+          "orderBy": "new"
+        });
+      }
+
       this.setState({
         "dialogOpen": false,
       });
@@ -223,7 +238,7 @@ class ReviewsList extends Component {
                             </TableCell>
                             <TableCell>{review.status}</TableCell>
                             <TableCell>{review.quality}</TableCell>
-                            <TableCell>{review.upVote.length}</TableCell>
+                            <TableCell>{review.upvote.length}</TableCell>
                           </TableRow>
                       ))
                     }
@@ -278,8 +293,8 @@ class ReviewsList extends Component {
                       value={this.state.status}
                       onChange={this.handleChange}
                     >
-                      <FormControlLabel value="normal" control={<Radio />} label="Normal" />
-                      <FormControlLabel value="suspended" control={<Radio />} label="Suspended" />
+                      <FormControlLabel value="NORMAL" control={<Radio />} label="Normal" />
+                      <FormControlLabel value="SUSPENDED" control={<Radio />} label="Suspended" />
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -334,4 +349,4 @@ const mapStateToProps = (state, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, { getReviews, clearReviewsList, updateReview })(withStyles(styles)(ReviewsList));
+export default connect(mapStateToProps, { getReviews, clearReviewsList, editReview })(withStyles(styles)(ReviewsList));
