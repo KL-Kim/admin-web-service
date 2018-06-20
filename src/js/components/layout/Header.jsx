@@ -25,8 +25,6 @@ import LinkContainer from '../utils/LinkContainer';
 import Avatar from '../utils/Avatar';
 import ProperName from '../utils/ProperName';
 
-
-
 const styles = theme => ({
   "appBar": {
     zIndex: theme.zIndex.drawer + 1,
