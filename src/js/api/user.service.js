@@ -2,9 +2,7 @@ import Promise from 'bluebird';
 import fetch from 'cross-fetch';
 
 import config from '../config/config';
-import { saveToStorage } from '../helpers/webStorage';
 import userTypes from '../constants/user.types';
-import webStorageTypes from '../constants/webStorage.types';
 import responseErrorHandler from '../helpers/error-handler.js';
 
 /**
@@ -35,14 +33,6 @@ export const getMyselfFetch = (token, id) => {
         return response.json();
       } else {
         return Promise.reject(responseErrorHandler(response));
-      }
-    })
-    .then(user => {
-      if (user) {
-        return user;
-      } else {
-        const err = new Error("Bad response");
-        return Promise.reject(err);
       }
     }).catch(err => {
       return Promise.reject(err);

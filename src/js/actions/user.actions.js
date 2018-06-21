@@ -11,7 +11,7 @@ import {
   getMyselfFetch,
 } from '../api/user.service';
 import { getToken, loginFetch, logoutFetch, requestSendEmailFetch } from '../api/auth.service';
-import { removeFromStorage } from '../helpers/webStorage';
+import { saveToStorage, removeFromStorage } from '../helpers/webStorage';
 
 /**
  * Login
@@ -51,16 +51,25 @@ export const login = (email, password) => {
     dispatch(_requestLogin());
 
     return loginFetch(email, password)
-      .then(user => {
-        dispatch(_loginSuccess(user));
-        dispatch(AlertActions.alertSuccess("Login successfully"));
+      .then(response => {
+        saveToStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED, 0);
 
-        return ;
-      }).catch(err => {
-        if (err.message) {
-          dispatch(AlertActions.alertFailure(err.message));
+        if (response.token) {
+          saveToStorage(webStorageTypes.WEB_STORAGE_TOKEN_KEY, response.token);
         }
+
+        if (response.user) {
+          saveToStorage(webStorageTypes.WEB_STORAGE_USER_KEY, response.user._id);
+          saveToStorage(webStorageTypes.WEB_STORAGE_USER_FAVOR, response.user.favors);
+          dispatch(_loginSuccess(response.user));
+        }
+
+        dispatch(AlertActions.alertSuccess("Welcome back!"));
+
+        return response;
+      }).catch(err => {
         dispatch(_loginFailure(err));
+        dispatch(AlertActions.alertFailure(err.message));
 
         return ;
       });
@@ -97,7 +106,7 @@ export const getMyself = (id) => {
   });
 
   return (dispatch, getState) => {
-    getToken()
+    return getToken()
       .then(token => {
         dispatch(_getMyselfRequest());
         return getMyselfFetch(token, id);
@@ -107,7 +116,9 @@ export const getMyself = (id) => {
 
         return user;
       }).catch(err => {
-        return dispatch(_getMyselfFailure(err));
+        dispatch(_getMyselfFailure(err));
+
+        return ;
       });
   };
 }
@@ -143,19 +154,19 @@ export const logout = () => {
     removeFromStorage(webStorageTypes.WEB_STORAGE_USER_KEY);
     removeFromStorage(webStorageTypes.WEB_STORAGE_USER_FAVOR);
 
-    return logoutFetch().then(json => {
-      dispatch(_logoutSuccess());
-      dispatch(AlertActions.alertSuccess("Log out successfully"));
+    return logoutFetch()
+      .then(response => {
+        dispatch(_logoutSuccess());
+        dispatch(AlertActions.alertSuccess("Log out successfully"));
 
-      return ;
-    }).catch(err => {
-      dispatch(_logoutFailure(err));
-      if (err.message) {
+        return response;
+      })
+      .catch(err => {
+        dispatch(_logoutFailure(err));
         dispatch(AlertActions.alertFailure(err.message));
-      }
 
-      return ;
-    });
+        return ;
+      });
   };
 };
 
@@ -199,10 +210,14 @@ export const sendEmail = (type, email) => {
     return requestSendEmailFetch(type, email)
       .then(res => {
         dispatch(_sendEmailSuccess());
-        return dispatch(AlertActions.alertSuccess("Send email successfully"));
+        dispatch(AlertActions.alertSuccess("Send email successfully"));
+
+        return res;
       }).catch(err => {
         dispatch(_sendEmailFailure());
-        return dispatch(AlertActions.alertFailure("Send email failed"));
+        dispatch(AlertActions.alertFailure("Send email failed"));
+
+        return ;
       });
   };
 };

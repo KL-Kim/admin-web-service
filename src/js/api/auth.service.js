@@ -22,7 +22,7 @@ const authServiceUri = {
 /**
  * Fetch new token
  */
-const newTokenFetch = () => {
+const fetchNewToken = () => {
   const options = {
     "method": 'GET',
     "headers": {
@@ -40,7 +40,6 @@ const newTokenFetch = () => {
       }
     })
     .then(res => {
-      console.log("Get new token");
       saveToStorage(webStorageTypes.WEB_STORAGE_TOKEN_KEY, res.token);
       return res.token;
     })
@@ -60,7 +59,7 @@ export const getToken = () => {
     const now = _.now();
 
     if (_.isEmpty(decoded) || decoded.exp * 1000 < now) {
-      newTokenFetch()
+      fetchNewToken()
         .then(accessToken => {
           return resolve(accessToken);
         })
@@ -92,7 +91,6 @@ export const loginFetch = (email, password) => {
   return fetch(authServiceUri.loginUrl, options)
     .then(response => {
       if (response.ok) {
-        saveToStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED, 0);
         return response.json();
       } else {
         let error = new Error(response.statusText);
@@ -102,26 +100,11 @@ export const loginFetch = (email, password) => {
           error.message = "Invalid email or password";
           const loginFailedCount = loadFromStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED);
           saveToStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED, loginFailedCount + 1);
-
         } else {
           error.message = "Unknown Server Error";
         }
 
         return Promise.reject(error);
-      }
-    })
-    .then(json => {
-      if (json.token) {
-        saveToStorage(webStorageTypes.WEB_STORAGE_TOKEN_KEY, json.token);
-      }
-
-      if (json.user) {
-        saveToStorage(webStorageTypes.WEB_STORAGE_USER_KEY, json.user._id);
-        saveToStorage(webStorageTypes.WEB_STORAGE_USER_FAVOR, json.user.favors);
-        return json.user;
-      } else {
-        const err = new Error("Bad Response");
-        return Promise.reject(err);
       }
     })
     .catch(err => {
