@@ -198,7 +198,7 @@ class CategoryList extends Component {
     if (code && enName && krName && cnName) {
       if (isNew) {
         this.props.addNewCategory({
-          code: code,
+          code,
           enName,
           krName,
           cnName,
@@ -386,7 +386,7 @@ class CategoryList extends Component {
                     <TextField fullWidth id="code" label="Code" margin="normal" name="code" onChange={this.handleChange} value={this.state.code} />
                   </Grid>
                   <Grid item xs={6}>
-                    <TextField fullWidth id="enName" label="English" margin="normal" name="enName" onChange={this.handleChange} value={this.state.enName} />
+                    <TextField fullWidth id="enName" label="English Name" margin="normal" name="enName" onChange={this.handleChange} value={this.state.enName} />
                   </Grid>
                   <Grid item xs={6}>
                     <TextField fullWidth id="krName" label="한국어" margin="normal" name="krName" onChange={this.handleChange} value={this.state.krName} />
