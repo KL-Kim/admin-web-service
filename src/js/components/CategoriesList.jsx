@@ -72,7 +72,6 @@ class CategoryList extends Component {
       "enName": '',
       "krName": '',
       "cnName": '',
-      'parent': '',
       'priority': 0,
       'orderBy': 'priority',
     };
@@ -109,7 +108,6 @@ class CategoryList extends Component {
       krName: category.krName,
       cnName: category.cnName,
       enName: category.enName,
-      parent: category.parent || '',
       priority: category.priority,
       AddNewDiaglogOpen: true,
     });
@@ -141,7 +139,6 @@ class CategoryList extends Component {
               "enName": '',
               "krName": '',
               "cnName": '',
-              'parent': '',
               'priority': 0,
             });
           }
@@ -158,7 +155,6 @@ class CategoryList extends Component {
       "enName": '',
       "krName": '',
       "cnName": '',
-      'parent': '',
       'priority': 0,
     });
   }
@@ -172,7 +168,6 @@ class CategoryList extends Component {
       "enName": '',
       "krName": '',
       "cnName": '',
-      'parent': '',
       'priority': 0,
     });
   }
@@ -193,7 +188,7 @@ class CategoryList extends Component {
   }
 
   handleSubmit() {
-    const { _id, code, enName, krName, cnName, parent, priority, isNew } = this.state;
+    const { _id, code, enName, krName, cnName, priority, isNew } = this.state;
 
     if (code && enName && krName && cnName) {
       if (isNew) {
@@ -202,7 +197,6 @@ class CategoryList extends Component {
           enName,
           krName,
           cnName,
-          parent,
           priority,
         })
         .then(response => {
@@ -220,7 +214,6 @@ class CategoryList extends Component {
           enName,
           krName,
           cnName,
-          parent,
           priority,
         })
         .then(response => {
@@ -239,7 +232,6 @@ class CategoryList extends Component {
             "enName": '',
             "krName": '',
             "cnName": '',
-            'parent': '',
             'priority': 0,
           });
         });
@@ -335,7 +327,6 @@ class CategoryList extends Component {
                   <TableCell>한국어</TableCell>
                   <TableCell>中文名</TableCell>
                   <TableCell>Slug</TableCell>
-                  <TableCell>Parent</TableCell>
                   <TableCell>Priority</TableCell>
                 </TableRow>
               </TableHead>
@@ -350,7 +341,6 @@ class CategoryList extends Component {
                         <TableCell>{item.krName}</TableCell>
                         <TableCell>{item.cnName}</TableCell>
                         <TableCell>{item.enName}</TableCell>
-                        <TableCell>{item.parent}</TableCell>
                         <TableCell>{item.priority}</TableCell>
                       </TableRow>
                   ))
@@ -393,27 +383,6 @@ class CategoryList extends Component {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField fullWidth id="cnName" label="中文名" margin="normal" name="cnName" onChange={this.handleChange} value={this.state.cnName} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <FormControl fullWidth margin="normal">
-                      <InputLabel htmlFor="parent">Parent</InputLabel>
-                      <Select native
-                        name="parent"
-                        value={this.state.parent}
-                        onChange={this.handleChange}
-                        input={<Input id="parent" />}
-                      >
-                        <option value="" />
-                        {
-                          _.isEmpty(categoriesList)
-                            ? ''
-                            : categoriesList.map(item => (
-                                <option key={item.code} value={item.code}>{item.krName}</option>
-                              ))
-                        }
-                      </Select>
-                    </FormControl>
                   </Grid>
 
                   <Grid item xs={6}>
