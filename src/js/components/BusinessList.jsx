@@ -56,7 +56,7 @@ class BusinessList extends Component {
 
     this.state = {
       "search": '',
-      "rowsPerPage": 10,
+      "rowsPerPage": 20,
       "page": 0,
       "status": '',
       "event": false,
