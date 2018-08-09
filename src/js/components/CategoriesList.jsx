@@ -237,8 +237,6 @@ class CategoryList extends Component {
         });
       }
     }
-
-
   }
 
   handleSort(e) {

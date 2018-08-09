@@ -720,7 +720,8 @@ class SingleBusinessPage extends Component {
       && this.state.tel
       && this.state.category._id
       && this.state.address.area.code
-    ) {
+    ) 
+    {
       const data = {
         businessState: this.state.businessState,
         priority: this.state.priority,
@@ -766,11 +767,14 @@ class SingleBusinessPage extends Component {
 
       // Set business category id
       if (this.state.category) {
-        data.category = this.state.category._id
+        data.category = this.state.category._id;
       }
 
-      // Set business tag
-      if (!_.isEmpty(this.state.tags)) {
+      // Business tags
+      if (_.isEmpty(this.state.tags)) {
+        data.tags = [];
+      } 
+      else {
         let tags = [];
         let index;
 
@@ -789,16 +793,21 @@ class SingleBusinessPage extends Component {
         data.tags = tags.slice();
       }
 
-      if (!_.isEmpty(this.state.chains)) {
+      // Business Chains
+      if (_.isEmpty(this.state.chains)) {
+        data.chains = [];
+      } 
+      else {
         let chains = [];
 
         this.state.chains.map(item =>
           chains.push(item._id)
-        )
+        );
 
         data.chains = chains.slice();
       }
 
+      // Business Geo Location
       if (!_.isEmpty(this.state.geo)) {
         data.geo = {
           type: "Point",
@@ -811,7 +820,8 @@ class SingleBusinessPage extends Component {
 
       if (this.state._id) {
         this.props.updateBusiness(this.state._id, data);
-      } else {
+      } 
+      else {
         this.props.addBusiness(data);
       }
 
