@@ -45,16 +45,7 @@ import {
 } from '../actions/tag.actions.js';
 
 const styles = (theme) => ({
-  "container": {
-    marginBottom: theme.spacing.unit,
-  },
-  "buttonContainer": {
-    "display": "flex",
-    "justifyContent": "flex-end",
-  },
-  "button": {
-    margin: theme.spacing.unit,
-  },
+
 });
 
 class TagsList extends Component {
@@ -249,33 +240,33 @@ class TagsList extends Component {
             Tags List
           </Typography>
 
-          <Grid container spacing={16} className={classes.container}>
-            <Grid item xs={12}>
-              <form onSubmit={this.handleSearch}>
-                <FormControl fullWidth>
-                  <InputLabel htmlFor="adornment-password">Search</InputLabel>
-                  <Input
-                    id="search"
-                    type="text"
-                    name="search"
-                    onChange={this.handleChange}
-                    onKeyPress={this.handleKeyPress}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="Toggle password visibility"
-                          onClick={this.handleSearch}
-                        >
-                          <Search />
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </FormControl>
-              </form>
-            </Grid>
+          <form onSubmit={this.handleSearch}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="adornment-password">Search</InputLabel>
+              <Input
+                id="search"
+                type="text"
+                name="search"
+                onChange={this.handleChange}
+                onKeyPress={this.handleKeyPress}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="Toggle password visibility"
+                      onClick={this.handleSearch}
+                    >
+                      <Search />
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </form>
+          
+          <br />
 
-            <Grid item xs={6}>
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
               <FormControl fullWidth >
                 <FormLabel component="label">Sort</FormLabel>
                 <RadioGroup
@@ -291,10 +282,15 @@ class TagsList extends Component {
               </FormControl>
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item>
               <div className={classes.buttonContainer}>
-                <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNewDialogOpen}>
-                  Add New
+                <Button 
+                  variant="raised" 
+                  color="primary" 
+                  aria-label="add" 
+                  onClick={this.handleAddNewDialogOpen}
+                >
+                  New
                 </Button>
               </div>
             </Grid>
@@ -332,61 +328,129 @@ class TagsList extends Component {
           </Paper>
 
           <Dialog
+            fullWidth
+            maxWidth="sm"
             open={this.state.AddNewDiaglogOpen}
             onClose={this.handleAddNewDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
+            aria-labelledby="tag-dialog-title"
+            aria-describedby="tag-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">
-              <Grid container>
-                <Grid item xs={6}>
+            <DialogTitle id="tag-dialog-title">
+              <Grid container justify="space-between" alignItems="flex-start">
+                <Grid item>
                   Tag
                 </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.buttonContainer}>
-                    <Button color="secondary" disabled={!(code && enName && krName && cnName) || isNew} onClick={this.handleOpenDeleteDialog}>
-                      Delete
-                    </Button>
-                  </div>
+                <Grid item>
+                  <Button 
+                    color="secondary" 
+                    size="small"
+                    disabled={!(code && enName && krName && cnName) || isNew} 
+                    onClick={this.handleOpenDeleteDialog}
+                  >
+                    Delete
+                  </Button>
                 </Grid>
               </Grid>
             </DialogTitle>
-            <DialogContent id="alert-dialog-description">
+
+            <DialogContent id="tag-dialog-description">
               <Grid container spacing={16}>
                 <Grid item xs={6}>
-                  <TextField fullWidth id="code" label="Code" margin="normal" name="code" onChange={this.handleChange} value={this.state.code} />
+                  <TextField 
+                    fullWidth 
+                    id="code" 
+                    label="Code" 
+                    margin="normal" 
+                    name="code" 
+                    value={this.state.code} 
+                    onChange={this.handleChange} 
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') this.handleSubmit();
+                    }} 
+                  />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField fullWidth id="enName" label="English" margin="normal" name="enName" onChange={this.handleChange} value={this.state.enName} />
+                  <TextField 
+                    fullWidth 
+                    id="enName" 
+                    label="English" 
+                    margin="normal" 
+                    name="enName" 
+                    value={this.state.enName}
+                    onChange={this.handleChange} 
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') this.handleSubmit();
+                    }}
+                  />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField fullWidth id="krName" label="한국어" margin="normal" name="krName" onChange={this.handleChange} value={this.state.krName} />
+                  <TextField 
+                    fullWidth 
+                    id="krName" 
+                    label="한국어" 
+                    margin="normal" 
+                    name="krName" 
+                    value={this.state.krName} 
+                    onChange={this.handleChange} 
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') this.handleSubmit();
+                    }}
+                  />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField fullWidth id="cnName" label="中文名" margin="normal" name="cnName" onChange={this.handleChange} value={this.state.cnName} />
+                  <TextField 
+                    fullWidth 
+                    id="cnName" 
+                    label="中文名" 
+                    margin="normal" 
+                    name="cnName" 
+                    value={this.state.cnName}
+                    onChange={this.handleChange}  
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') this.handleSubmit();
+                    }}
+                  />
                 </Grid>
                 <Grid item xs={6}>
-                  <TextField fullWidth id="priority" label="Priority" margin="normal" name="priority" onChange={this.handleChange} value={this.state.priority} />
+                  <TextField 
+                    fullWidth 
+                    id="priority" 
+                    label="Priority" 
+                    margin="normal" 
+                    name="priority" 
+                    value={this.state.priority}
+                    onChange={this.handleChange} 
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') this.handleSubmit();
+                    }}
+                  />
                 </Grid>
               </Grid>
-
             </DialogContent>
+
             <DialogActions>
-              <Button variant="raised" autoFocus color="primary" disabled={!(code && enName && krName && cnName)} onClick={this.handleSubmit}>
-                Save
-              </Button>
-              <Button color="primary" onClick={this.handleAddNewDialogClose}>
+              <Button 
+                size="small"
+                onClick={this.handleAddNewDialogClose}>
                 Cancel
+              </Button>
+              <Button 
+                color="primary" 
+                size="small"
+                disabled={!(code && enName && krName && cnName)} 
+                onClick={this.handleSubmit}
+              >
+                Save
               </Button>
             </DialogActions>
           </Dialog>
 
           <ConfirmationDialog
+            title="Warning"
+            content={"Are your sure to delete <Tag: " + this.state.krName + '> ?'}
             open={this.state.confirmationDialogOpen}
             handleClose={this.handleCloseConfirmationDialog}
             operation={this.handleDelete}
-            title="Warning"
-            content="Are your sure to delete the category?"
           />
         </div>
       </SettingContainer>
