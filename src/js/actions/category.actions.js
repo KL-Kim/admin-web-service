@@ -4,11 +4,13 @@
 import _ from 'lodash';
 
 import categoryTypes from '../constants/category.types';
-import { loadFromStorage, saveToStorage } from '../helpers/webStorage';
-import webStorageTypes from '../constants/webStorage.types';
-import * as AlertActions from './alert.actions';
 import { getToken } from '../api/auth.service';
 import { fetchCategoriesOrTags, categoryOperationFetch } from '../api/business.service';
+import * as AlertActions from './alert.actions';
+
+// WebStorage
+import { loadFromStorage, saveToStorage } from '../helpers/webStorage';
+import webStorageTypes from '../constants/webStorage.types';
 
 /**
  * Get business categories list

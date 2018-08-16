@@ -220,7 +220,7 @@ class SingleBusinessPage extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.handleChangeCategory = this.handleChangeCategory.bind(this);
+    this.handleSelectCategory = this.handleSelectCategory.bind(this);
     this.handleChangeAddress = this.handleChangeAddress.bind(this);
     this.handleChangeOpenningSpec = this.handleChangeOpenningSpec.bind(this);
     this.handleOpenChainsDialog = this.handleOpenChainsDialog.bind(this);
@@ -346,8 +346,8 @@ class SingleBusinessPage extends Component {
     });
   }
 
-  handleChangeCategory(e) {
-    const { name, value } = e.target;
+  handleSelectCategory(e) {
+    const { value } = e.target;
 
     this.setState({
       "category": {
@@ -358,7 +358,6 @@ class SingleBusinessPage extends Component {
         enName: value.enName,
       }
     });
-
   }
 
   handleChangeAddress(e) {
@@ -1086,25 +1085,29 @@ class SingleBusinessPage extends Component {
                         <InputLabel htmlFor="category" required error>Category</InputLabel>
                         <Select
                           name="category"
-                          value={this.state.category.krName}
-                          onChange={this.handleChangeCategory}
+                          value={_.isEmpty(this.state.category) ? '' : this.state.category.krName}
+                          onChange={this.handleSelectCategory}
                           input={<Input id="category" />}
                           renderValue={selected => selected}
                         >
-                          {_.isEmpty(this.props.categoriesList) ? '' : this.props.categoriesList.map(item => (
-                            <MenuItem
-                              key={item.code}
-                              value={{
-                                _id: item._id,
-                                code: item.code,
-                                krName: item.krName,
-                                cnName: item.cnName,
-                                enName: item.enName,
-                              }}
-                            >
-                              <ListItemText primary={item.krName} />
-                            </MenuItem>
-                          ))}
+                          {
+                            _.isEmpty(this.props.categoriesList) 
+                              ? null 
+                              : this.props.categoriesList.map(item => (
+                                  <MenuItem
+                                    key={item.code}
+                                    value={{
+                                      _id: item._id,
+                                      code: item.code,
+                                      krName: item.krName,
+                                      cnName: item.cnName,
+                                      enName: item.enName,
+                                    }}
+                                  >
+                                    <ListItemText primary={item.krName} />
+                                  </MenuItem>
+                                ))
+                          }
                         </Select>
                       </FormControl>
                     </Paper>
