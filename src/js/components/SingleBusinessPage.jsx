@@ -45,7 +45,6 @@ import Select from '@material-ui/core/Select';
 import Checkbox from '@material-ui/core/Checkbox';
 import Switch from '@material-ui/core/Switch';
 import Badge from '@material-ui/core/Badge';
-import CircularProgress from '@material-ui/core/CircularProgress';
 
 // Material UI Icons
 import Search from '@material-ui/icons/Search';
@@ -98,7 +97,8 @@ const modules = {
   ]
 };
 
-const format = ['header',
+const format = [
+  'header',
   'bold', 'italic', 'underline', 'strike', 'blockquote', 'code',
   'color', 'background',
   'list', 'bullet', 'indent',
@@ -106,7 +106,7 @@ const format = ['header',
 
 const styles = (theme) => ({
   "paper": {
-    padding: theme.spacing.unit * 3,
+    padding: theme.spacing.unit * 4,
     marginBottom: theme.spacing.unit * 2,
   },
   "buttonContainer": {
@@ -114,20 +114,15 @@ const styles = (theme) => ({
     "justifyContent": "flex-end",
   },
   "button": {
-    "margin": theme.spacing.unit,
+    "marginLeft": theme.spacing.unit,
+    "marginRight": theme.spacing.unit,
     "width": 150,
-  },
-  "progress": {
-    margin: theme.spacing.unit * 2,
   },
   "chip": {
     margin: theme.spacing.unit,
   },
   "badge": {
     margin: theme.spacing.unit * 2,
-  },
-  "title": {
-    paddingRight: theme.spacing.unit * 2,
   },
 });
 
@@ -146,7 +141,6 @@ class SingleBusinessPage extends Component {
         enName: '',
       },
       "tags": [],
-      keywords: '',
       status: 'DRAFT',
       cnName: '',
       krName: '',
@@ -196,10 +190,10 @@ class SingleBusinessPage extends Component {
       "favoredCount": 0,
       reviewsCount: 0,
       "event": null,
-      menu: [],
+      "menu": [],
       "reports": [],
-      thumbnailUri: {},
-      imagesUri: [],
+      mainImage: {},
+      gallery: [],
     }
 
     this.state._id = '';
@@ -236,25 +230,19 @@ class SingleBusinessPage extends Component {
     this.handleChainRowClick = this.handleChainRowClick.bind(this);
     this.handleDeleteChainChip = this.handleDeleteChainChip.bind(this);
     this.handleSearchBusiness = this.handleSearchBusiness.bind(this);
-    this.updateBusinessImages = this.updateBusinessImages.bind(this);
     this.handleDeleteBusiness = this.handleDeleteBusiness.bind(this);
     this.handleReportsRowClick = this.handleReportsRowClick.bind(this);
     this.handleCloseReportDialog = this.handleCloseReportDialog.bind(this);
     this.handleDeleteReport = this.handleDeleteReport.bind(this);
     this.handleDescriptionEditorChange = this.handleDescriptionEditorChange.bind(this);
-    this.handleEventEditorChange = this.handleEventEditorChange.bind(this);
+    this.getNewData = this.getNewData.bind(this);
   }
 
   componentDidMount() {
-    if (_.isEmpty(this.props.categoriesList)) {
-      this.props.getCategoriesList();
-    }
+    this.props.getCategoriesList();
+    this.props.getTagsList();
 
-    if (_.isEmpty(this.props.tagsList)) {
-      this.props.getTagsList();
-    }
-
-    if (this.state.slug)
+    if (this.state.slug) {
       this.props.getSingleBusiness(this.state.slug)
         .then(business => {
           if (_.isEmpty(business)) return ;
@@ -262,13 +250,8 @@ class SingleBusinessPage extends Component {
           this.setState({
             _id: business._id,
             "category": {
-              _id: _.isEmpty(business.category) ? '' : business.category._id,
-              code: _.isEmpty(business.category) ? '' : business.category.code || '',
-              krName: _.isEmpty(business.category) ? '' : business.category.krName || '',
-              cnName: _.isEmpty(business.category) ? '' : business.category.cnName || '',
-              enName: _.isEmpty(business.category) ? '' : business.category.enName || '',
+              ...business.category
             },
-            keywords: _.isEmpty(business.keywords) ? '' : business.keywords,
             priority: business.priority || 0,
             businessState: business.businessState || '',
             cnName: business.cnName || '',
@@ -281,32 +264,14 @@ class SingleBusinessPage extends Component {
             delivery: business.delivery || '',
             status: business.status || '',
             "address": {
-              province: {
-                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.name || '')),
-                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.province) ? '' : (business.address.province.code || '')),
-              },
-              city: {
-                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.name || '')),
-                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.city) ? '' : (business.address.city.code || '')),
-              },
-              area: {
-                name: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.name || '')),
-                code: _.isEmpty(business.address) ? '' : (_.isEmpty(business.address.area) ? '' : (business.address.area.code || '')),
-              },
-              street:  _.isEmpty(business.address) ? '' : (business.address.street || ''),
+              ...business.address
             },
             "geo": {
               lat:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[0] || 0),
               long:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[1] || 0),
             },
             "openningHoursSpec": {
-              mon: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.mon || ''),
-              tue: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.tue || ''),
-              wed: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.wed || ''),
-              thu: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.thu || ''),
-              fri: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.fri || ''),
-              sat: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sat || ''),
-              sun: _.isEmpty(business.openningHoursSpec) ? '' : (business.openningHoursSpec.sun || ''),
+              ...business.openningHoursSpec
             },
             rest: business.rest || '',
             chains: _.isEmpty(business.chains) ? [] : business.chains.slice(),
@@ -317,13 +282,13 @@ class SingleBusinessPage extends Component {
             favoredCount: business.favoredCount || 0,
             reviewsCount: _.isEmpty(business.reviewsList) ? 0 : business.reviewsList.length,
             event: business.event || null,
-            menu: _.isEmpty(business.menu) ? [] : business.menu.slice(),
-            reports: _.isEmpty(business.reports) ? [] : business.reports.slice(),
-            thumbnailUri: {
-              "default": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.default,
-              "hd": _.isEmpty(business.thumbnailUri) ? '' : business.thumbnailUri.hd,
+            menu: _.isEmpty(business.menu) ? [] : [...business.menu],
+            reports: _.isEmpty(business.reports) ? [] : [...business.reports],
+            mainImage: {
+              name: _.isEmpty(business.mainImage) ? '' : business.mainImage.name,
+              url: _.isEmpty(business.mainImage) ? '' : business.mainImage.url,
             },
-            imagesUri: _.isEmpty(business.imagesUri) ? [] : business.imagesUri.slice(),
+            gallery: _.isEmpty(business.gallery) ? [] : [...business.gallery],
           });
 
           if (!_.isEmpty(business.tags)) {
@@ -332,10 +297,73 @@ class SingleBusinessPage extends Component {
             business.tags.map(tag => tags.push(tag.krName));
 
             this.setState({
-              tags: tags.slice()
+              tags: [...tags]
             });
           }
         });
+    }
+  }
+
+  getNewData() {
+    if (this.state.slug) {
+      this.props.getSingleBusiness(this.state.slug)
+        .then(business => {
+          if (_.isEmpty(business)) return ;
+
+          this.setState({
+            "category": {
+              ...business.category
+            },
+            priority: business.priority || 0,
+            businessState: business.businessState || '',
+            cnName: business.cnName || '',
+            krName: business.krName || '',
+            enName: business.enName || '',
+            tel: business.tel || '',
+            priceRange: business.priceRange || '',
+            supportedLanguage: business.supportedLanguage || '',
+            payment: business.payment || '',
+            delivery: business.delivery || '',
+            status: business.status || '',
+            "address": {
+              ...business.address
+            },
+            "geo": {
+              lat:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[0] || 0),
+              long:  _.isEmpty(business.geo) ? 0 : (business.geo.coordinates[1] || 0),
+            },
+            "openningHoursSpec": {
+              ...business.openningHoursSpec
+            },
+            rest: business.rest || '',
+            chains: _.isEmpty(business.chains) ? [] : [...business.chains],
+            description: business.description || '',
+            "viewsCount": business.viewsCount,
+            weekViewsCount: business.weekViewsCount || 0,
+            monthViewsCount: business.monthViewsCount || 0,
+            favoredCount: business.favoredCount || 0,
+            reviewsCount: _.isEmpty(business.reviewsList) ? 0 : business.reviewsList.length,
+            event: business.event || '',
+            menu: _.isEmpty(business.menu) ? [] : [...business.menu],
+            reports: _.isEmpty(business.reports) ? [] : [...business.reports],
+            mainImage: {
+              name: _.isEmpty(business.mainImage) ? '' : business.mainImage.name,
+              url: _.isEmpty(business.mainImage) ? '' : business.mainImage.url,
+            },
+            gallery: _.isEmpty(business.gallery) ? [] : [...business.gallery],
+          });
+
+          if (!_.isEmpty(business.tags)) {
+            let tags = [];
+
+            business.tags.map(tag => tags.push(tag.krName));
+
+            this.setState({
+              tags: [...tags]
+            });
+          }
+        });
+    }
   }
 
   handleChange(e) {
@@ -524,8 +552,6 @@ class SingleBusinessPage extends Component {
 
   handleDescriptionEditorChange = (editorState) => this.setState({ description: editorState });
 
-  handleEventEditorChange = (editorState) => this.setState({ event: editorState });
-
   handleOpenChainsDialog() {
     this.setState({
       chainDialogOpen: true,
@@ -547,11 +573,12 @@ class SingleBusinessPage extends Component {
   }
 
   handleDeleteBusiness() {
-    this.props.deleteBusiness(this.state._id).then(response => {
-      if (response) {
-        this.props.history.goBack();
-      }
-    });
+    this.props.deleteBusiness(this.state._id)
+      .then(response => {
+        if (response) {
+          this.props.history.goBack();
+        }
+      });
   }
 
   handleChainRowClick(e, subdepartment) {
@@ -559,7 +586,7 @@ class SingleBusinessPage extends Component {
     chains.push(subdepartment);
 
     this.setState({
-      chains: chains.slice()
+      chains: [...chains]
     });
   }
 
@@ -568,10 +595,10 @@ class SingleBusinessPage extends Component {
     const index = this.state.chains.indexOf(data);
 
     chains.splice(index, 1);
-    const newSubdepartments = chains.slice();
+    const newChains = chains.slice();
 
     this.setState({
-      chains: newSubdepartments
+      chains: [...newChains]
     });
   }
 
@@ -590,6 +617,7 @@ class SingleBusinessPage extends Component {
 
   handleAddNewMenu() {
     let menu = this.state.menu.slice();
+
     if (_.isNumber(this.state.menuIndex)) {
       menu[this.state.menuIndex] = Object.assign({}, {
         name: this.state.newMenuName,
@@ -607,7 +635,7 @@ class SingleBusinessPage extends Component {
     }
 
     this.setState({
-      menu: menu,
+      menu: [...menu],
       menuIndex: null,
       addMenuDialogOpen: false,
       newMenuName: '',
@@ -618,29 +646,21 @@ class SingleBusinessPage extends Component {
   }
 
   handleDeleteMenu() {
-    if (_.isNumber(this.state.menuIndex)) this.state.menu.splice(this.state.menuIndex, 1);
-    const newMenu = this.state.menu.slice();
+    if (_.isNumber(this.state.menuIndex)) {
+      const newMenu = this.state.menu.slice();
 
-    if (_.isEmpty(this.state.menuIndex)) {
+      newMenu.splice(this.state.menuIndex, 1);
+
       this.setState({
         addMenuDialogOpen: false,
         menuIndex: null,
+        menu: [...newMenu],
         newMenuName: '',
         newMenuPrice: '',
         newMenuIsHot: false,
         newMenuIsNew: false,
       });
-    } else {
-      this.setState({
-        addMenuDialogOpen: false,
-        menuIndex: null,
-        menu: newMenu,
-        newMenuName: '',
-        newMenuPrice: '',
-        newMenuIsHot: false,
-        newMenuIsNew: false,
-      });
-    }
+    }    
   }
 
   handleMenuRowClick(e, menu, index) {
@@ -672,13 +692,6 @@ class SingleBusinessPage extends Component {
     });
   }
 
-  updateBusinessImages(images) {
-    this.setState({
-      thumbnailUri: Object.assign({}, images.thumbnailUri),
-      imagesUri: images.imagesUri.slice()
-    });
-  }
-
   handleReportsRowClick(e, report, index) {
     this.setState({
       reportDialogOpen: true,
@@ -698,16 +711,19 @@ class SingleBusinessPage extends Component {
   }
 
   handleDeleteReport() {
-    if (_.isNumber(this.state.reportIndex)) this.state.reports.splice(this.state.reportIndex, 1);
-    const newReports = this.state.reports.slice();
+    if (_.isNumber(this.state.reportIndex)) {
+      const newReports = this.state.reports.slice();
 
-    this.setState({
-      reports: newReports.slice(),
-      reportDialogOpen: false,
-      reportIsCheck: false,
-      reportContent: '',
-      reportIndex: '',
-    });
+      newReports.splice(this.state.reportIndex, 1);
+
+      this.setState({
+        reports: [...newReports],
+        reportDialogOpen: false,
+        reportIsCheck: false,
+        reportContent: '',
+        reportIndex: '',
+      });
+    }
   }
 
   handleSubmit(e) {
@@ -759,9 +775,9 @@ class SingleBusinessPage extends Component {
         },
         rest: this.state.rest,
         description: this.state.description,
-        "event": this.state.event || null,
-        menu: _.isEmpty(this.state.menu) ? [] : this.state.menu,
-        reports: _.isEmpty(this.state.reports) ? [] : this.state.reports,
+        "event": this.state.event,
+        menu: _.isEmpty(this.state.menu) ? [] : this.state.menu.slice(),
+        reports: _.isEmpty(this.state.reports) ? [] : this.state.reports.slice(),
       }
 
       // Set business category id
@@ -819,7 +835,7 @@ class SingleBusinessPage extends Component {
 
       if (this.state._id) {
         this.props.updateBusiness(this.state._id, data);
-      } 
+      }
       else {
         this.props.addBusiness(data);
       }
@@ -828,20 +844,20 @@ class SingleBusinessPage extends Component {
   }
 
   render() {
-    const { classes, cities, areas, isFetching } = this.props;
+    const { classes, cities, areas } = this.props;
 
     return (
       <SettingContainer>
-        {isFetching ? (<CircularProgress className={classes.progress} size={50} />) :
-          (<div>
+          <div>
             <Grid container spacing={24} alignItems="center">
               <Grid item xs={6}>
+                <Typography variant="display1" gutterBottom className={classes.title}>{this.state.krName + ' - ' + this.state.cnName}</Typography>
                 {
-                  (this.state.reports.length > 0)
+                  this.state.reports.length > 0
                     ? <Badge color="secondary" badgeContent={this.state.reports.length}>
-                        <Typography variant="display1" gutterBottom className={classes.title}>{this.state.cnName + ' - ' + this.state.krName}</Typography>
+                        <Typography>Reports</Typography>
                       </Badge>
-                    : <Typography variant="display1" gutterBottom className={classes.title}>{this.state.cnName + ' - ' + this.state.krName}</Typography>
+                    : null
                 }
               </Grid>
 
@@ -877,13 +893,12 @@ class SingleBusinessPage extends Component {
                   >
                     {this.state._id ? 'Update' : 'Save'}
                   </Button>
-
                 </div>
               </Grid>
             </Grid>
 
             <Grid container spacing={16}>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <FormControl fullWidth >
                     <FormLabel component="label" required error>Status</FormLabel>
@@ -902,7 +917,7 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <FormControl fullWidth error>
                     <FormLabel component="label" required>Business State</FormLabel>
@@ -920,7 +935,7 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Grid container alignItems="center">
                     <Grid item xs={6}>
@@ -951,7 +966,110 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-              <Grid item xs={9}>
+              <Grid item xs={6}>
+                <Paper className={classes.paper}>
+                  <Typography variant="title" gutterBottom>Event</Typography>
+                  <TextField fullWidth
+                    id="event"
+                    margin="normal"
+                    multiline
+                    rows={3}
+                    placeholder="New Event?"
+                    name="event"
+                    value={this.state.event}
+                    onChange={this.handleChange}
+                  />
+                </Paper>
+              </Grid>
+
+              <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <FormControl fullWidth>
+                        <InputLabel htmlFor="category" required error>Category</InputLabel>
+                        <Select
+                          name="category"
+                          value={_.isEmpty(this.state.category) ? '' : this.state.category.krName}
+                          onChange={this.handleSelectCategory}
+                          input={<Input id="category" />}
+                          renderValue={selected => selected}
+                        >
+                          {
+                            _.isEmpty(this.props.categoriesList) 
+                              ? null 
+                              : this.props.categoriesList.map(item => (
+                                  <MenuItem
+                                    key={item.code}
+                                    value={{
+                                      _id: item._id,
+                                      code: item.code,
+                                      krName: item.krName,
+                                      cnName: item.cnName,
+                                      enName: item.enName,
+                                    }}
+                                  >
+                                    <ListItemText primary={item.krName} />
+                                  </MenuItem>
+                                ))
+                          }
+                        </Select>
+                      </FormControl>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <FormControl fullWidth>
+                        <InputLabel htmlFor="tag">Tags</InputLabel>
+                        <Select multiple
+                          name="tags"
+                          value={this.state.tags}
+                          onChange={this.handleChange}
+                          input={<Input id="tag" />}
+                          renderValue={selected => selected.join(', ')}
+                        >
+                          {
+                            _.isEmpty(this.props.tagsList) ? '' : this.props.tagsList.map(item => (
+                              <MenuItem
+                                key={item.code}
+                                value={item.krName}
+                              >
+                                <Checkbox checked={this.state.tags.indexOf(item.krName) > -1} />
+                                <ListItemText primary={item.krName} />
+                              </MenuItem>
+                            ))
+                          }
+                        </Select>
+                      </FormControl>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <FormControl fullWidth>
+                        <InputLabel htmlFor="tag">Priority</InputLabel>
+                        <Select
+                          name="priority"
+                          value={this.state.priority}
+                          onChange={this.handleChange}
+                          input={<Input id="priority" />}
+                          renderValue={selected => selected}
+                        >
+                          {
+                            priorityList.map(item => (
+                              <MenuItem
+                                key={item}
+                                value={item}
+                              >
+                                <ListItemText primary={item} />
+                              </MenuItem>
+                            ))
+                          }
+                        </Select>
+                      </FormControl>
+                    </Paper>
+                  </Grid>
+
+                  <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Grid container spacing={16} alignItems="center">
                     <Grid item xs={12}>
@@ -1075,97 +1193,6 @@ class SingleBusinessPage extends Component {
 
                   </Grid>
                 </Paper>
-              </Grid>
-
-              <Grid item xs={3}>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                      <FormControl fullWidth>
-                        <InputLabel htmlFor="category" required error>Category</InputLabel>
-                        <Select
-                          name="category"
-                          value={_.isEmpty(this.state.category) ? '' : this.state.category.krName}
-                          onChange={this.handleSelectCategory}
-                          input={<Input id="category" />}
-                          renderValue={selected => selected}
-                        >
-                          {
-                            _.isEmpty(this.props.categoriesList) 
-                              ? null 
-                              : this.props.categoriesList.map(item => (
-                                  <MenuItem
-                                    key={item.code}
-                                    value={{
-                                      _id: item._id,
-                                      code: item.code,
-                                      krName: item.krName,
-                                      cnName: item.cnName,
-                                      enName: item.enName,
-                                    }}
-                                  >
-                                    <ListItemText primary={item.krName} />
-                                  </MenuItem>
-                                ))
-                          }
-                        </Select>
-                      </FormControl>
-                    </Paper>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                      <FormControl fullWidth>
-                        <InputLabel htmlFor="tag">Tags</InputLabel>
-                        <Select multiple
-                          name="tags"
-                          value={this.state.tags}
-                          onChange={this.handleChange}
-                          input={<Input id="tag" />}
-                          renderValue={selected => selected.join(', ')}
-                        >
-                          {
-                            _.isEmpty(this.props.tagsList) ? '' : this.props.tagsList.map(item => (
-                              <MenuItem
-                                key={item.code}
-                                value={item.krName}
-                              >
-                                <Checkbox checked={this.state.tags.indexOf(item.krName) > -1} />
-                                <ListItemText primary={item.krName} />
-                              </MenuItem>
-                            ))
-                          }
-                        </Select>
-                      </FormControl>
-                    </Paper>
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                      <FormControl fullWidth>
-                        <InputLabel htmlFor="tag">Priority</InputLabel>
-                        <Select
-                          name="priority"
-                          value={this.state.priority}
-                          onChange={this.handleChange}
-                          input={<Input id="priority" />}
-                          renderValue={selected => selected}
-                        >
-                          {
-                            priorityList.map(item => (
-                              <MenuItem
-                                key={item}
-                                value={item}
-                              >
-                                <ListItemText primary={item} />
-                              </MenuItem>
-                            ))
-                          }
-                        </Select>
-                      </FormControl>
-                    </Paper>
-                  </Grid>
-                </Grid>
               </Grid>
             </Grid>
 
@@ -1295,67 +1322,6 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-              <Grid item xs={6}>
-                <Paper className={classes.paper}>
-                  <Grid container spacing={16} alignItems="center">
-                    <Grid item xs={12}>
-                      <Typography variant="title">Statics</Typography>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField fullWidth disabled id="viewsCount" label="Total Views Count"  margin="normal" value={this.state.viewsCount} />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField fullWidth disabled id="monthViewsCount" label="Month Views Count"  margin="normal" value={this.state.monthViewsCount} />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField fullWidth disabled id="weekViewsCount" label="Week Views Count"  margin="normal" value={this.state.weekViewsCount} />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField fullWidth disabled id="favoredCount" label="Favored Count"  margin="normal" value={this.state.favoredCount} />
-                    </Grid>
-
-                    <Grid item xs={6}>
-                      <TextField fullWidth disabled id="ratingCount" label="Reviews Count"  margin="normal" value={this.state.reviewsCount} />
-                    </Grid>
-
-                  </Grid>
-                </Paper>
-              </Grid>
-
-
-              <Grid item xs={6}>
-                <Paper className={classes.paper}>
-                  <Typography variant="title">Reports</Typography>
-                  <Table className={classes.table}>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Index</TableCell>
-                      <TableCell>Checked</TableCell>
-                      <TableCell>Content</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {
-                      _.isEmpty(this.state.reports) ? (<TableRow></TableRow>)
-                      : this.state.reports.map((item, index) => (
-                        <TableRow hover key={index}
-                          onClick={event => this.handleReportsRowClick(event, item, index)}
-                        >
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{item.checked ? 'Yes' : 'No'}</TableCell>
-                          <TableCell>{item.content}</TableCell>
-                        </TableRow>
-                      ))
-                    }
-                  </TableBody>
-                </Table>
-                </Paper>
-              </Grid>
-
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Grid container spacing={16} alignItems="center">
@@ -1452,23 +1418,14 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-              <Grid item xs={6}>
+
+              <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" gutterBottom>Description</Typography>
                   <Quill value={this.state.description}
                     modules={modules}
                     format={format}
                     onChange={this.handleDescriptionEditorChange} />
-                </Paper>
-              </Grid>
-
-              <Grid item xs={6}>
-                <Paper className={classes.paper}>
-                  <Typography variant="title" gutterBottom>Event</Typography>
-                  <Quill value={this.state.event}
-                    modules={modules}
-                    format={format}
-                    onChange={this.handleEventEditorChange} />
                 </Paper>
               </Grid>
 
@@ -1516,198 +1473,264 @@ class SingleBusinessPage extends Component {
                   </Table>
                 </Paper>
               </Grid>
+
+               <Grid item xs={6}>
+                <Paper className={classes.paper}>
+                  <Grid container spacing={16} alignItems="center">
+                    <Grid item xs={12}>
+                      <Typography variant="title">Statics</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <TextField fullWidth disabled id="viewsCount" label="Total Views Count"  margin="normal" value={this.state.viewsCount} />
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <TextField fullWidth disabled id="monthViewsCount" label="Month Views Count"  margin="normal" value={this.state.monthViewsCount} />
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <TextField fullWidth disabled id="weekViewsCount" label="Week Views Count"  margin="normal" value={this.state.weekViewsCount} />
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <TextField fullWidth disabled id="favoredCount" label="Favored Count"  margin="normal" value={this.state.favoredCount} />
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <TextField fullWidth disabled id="ratingCount" label="Reviews Count"  margin="normal" value={this.state.reviewsCount} />
+                    </Grid>
+
+                  </Grid>
+                </Paper>
+              </Grid>
+
+
+              <Grid item xs={6}>
+                <Paper className={classes.paper}>
+                  <Typography variant="title">Reports</Typography>
+                  <Table className={classes.table}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Index</TableCell>
+                      <TableCell>Checked</TableCell>
+                      <TableCell>Content</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {
+                      _.isEmpty(this.state.reports) ? (<TableRow></TableRow>)
+                      : this.state.reports.map((item, index) => (
+                        <TableRow hover key={index}
+                          onClick={event => this.handleReportsRowClick(event, item, index)}
+                        >
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>{item.checked ? 'Yes' : 'No'}</TableCell>
+                          <TableCell>{item.content}</TableCell>
+                        </TableRow>
+                      ))
+                    }
+                  </TableBody>
+                </Table>
+                </Paper>
+              </Grid>
             </Grid>
 
             <BusinessImagesModule
-              id={this.state._id}
+              businessId={this.state._id}
+              mainImage={this.state.mainImage}
+              gallery={this.state.gallery}
+
               handleUpload={this.props.uploadImages}
               handleDelete={this.props.deleteImage}
-              thumbnailUri={this.state.thumbnailUri}
-              imagesUri={this.state.imagesUri}
-              updateBusinessImages={this.updateBusinessImages}
+              updateBusiness={this.getNewData}
             />
 
-            <Dialog fullWidth
-              open={this.state.chainDialogOpen}
-              onClose={this.handleCloseChainsDialog}
-              aria-labelledby="sd-dialog-title"
-              aria-describedby="sd-dialog-description"
-            >
-              <DialogTitle id="sd-dialog-title" >
-                <Grid container justify="space-between" alignItems="center">
-                  <Grid item xs={8}>
-                    Chain
+            <div>
+              <Dialog fullWidth
+                open={this.state.chainDialogOpen}
+                onClose={this.handleCloseChainsDialog}
+                aria-labelledby="sd-dialog-title"
+                aria-describedby="sd-dialog-description"
+              >
+                <DialogTitle id="sd-dialog-title" >
+                  <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={8}>
+                      Chain
+                    </Grid>
+
+                    <Grid item xs={4}>
+                      <form onSubmit={this.handleSearchBusiness}>
+                        <FormControl fullWidth margin="none">
+                          <InputLabel htmlFor="adornment-password">Search</InputLabel>
+                          <Input
+                            id="search"
+                            type="text"
+                            name="search"
+                            onChange={this.handleChange}
+                            onKeyPress={this.handleKeyPress}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="Toggle password visibility"
+                                  onClick={this.handleSearchBusiness}
+                                >
+                                  <Search />
+                                </IconButton>
+                              </InputAdornment>
+                            }
+                          />
+                        </FormControl>
+                      </form>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={4}>
-                    <form onSubmit={this.handleSearchBusiness}>
-                      <FormControl fullWidth margin="none">
-                        <InputLabel htmlFor="adornment-password">Search</InputLabel>
-                        <Input
-                          id="search"
-                          type="text"
-                          name="search"
-                          onChange={this.handleChange}
-                          onKeyPress={this.handleKeyPress}
-                          endAdornment={
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="Toggle password visibility"
-                                onClick={this.handleSearchBusiness}
-                              >
-                                <Search />
-                              </IconButton>
-                            </InputAdornment>
+                </DialogTitle>
+                <DialogContent id="sd-dialog-description">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Table className={classes.table}>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Index</TableCell>
+                            <TableCell>한국어</TableCell>
+                            <TableCell>中文名</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {
+                            _.isEmpty(this.props.businessList) ? (<TableRow></TableRow>)
+                            : this.props.businessList.map((item, index) => (
+
+                                <TableRow hover key={index}
+                                  onClick={event => this.handleChainRowClick(event, item)}
+                                >
+                                  <TableCell>{index + 1}</TableCell>
+                                  <TableCell>{item.krName}</TableCell>
+                                  <TableCell>{item.cnName}</TableCell>
+                                </TableRow>
+
+                            ))
                           }
-                        />
-                      </FormControl>
-                    </form>
+                        </TableBody>
+                      </Table>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </DialogTitle>
-              <DialogContent id="sd-dialog-description">
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Table className={classes.table}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Index</TableCell>
-                          <TableCell>한국어</TableCell>
-                          <TableCell>中文名</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {
-                          _.isEmpty(this.props.businessList) ? (<TableRow></TableRow>)
-                          : this.props.businessList.map((item, index) => (
 
-                              <TableRow hover key={index}
-                                onClick={event => this.handleChainRowClick(event, item)}
-                              >
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell>{item.krName}</TableCell>
-                                <TableCell>{item.cnName}</TableCell>
-                              </TableRow>
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary" onClick={this.handleCloseChainsDialog}>
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
-                          ))
-                        }
-                      </TableBody>
-                    </Table>
+              <Dialog fullWidth
+                open={this.state.addMenuDialogOpen}
+                onClose={this.handleCloseAddMenuDialog}
+                aria-labelledby="menu-dialog-title"
+                aria-describedby="menu-dialog-description"
+              >
+                <DialogTitle id="menu-dialog-title">
+                  <Grid container>
+                    <Grid item xs={6}>
+                      New Menu
+                    </Grid>
+                    <Grid item xs={6}>
+                      <div className={classes.buttonContainer}>
+                        <Button color="secondary" disabled={!_.isNumber(this.state.menuIndex)} onClick={this.handleDeleteMenu}>
+                          Delete
+                        </Button>
+                      </div>
+                    </Grid>
                   </Grid>
-                </Grid>
-
-              </DialogContent>
-              <DialogActions>
-                <Button color="primary" onClick={this.handleCloseChainsDialog}>
-                  Close
-                </Button>
-              </DialogActions>
-            </Dialog>
-
-            <Dialog fullWidth
-              open={this.state.addMenuDialogOpen}
-              onClose={this.handleCloseAddMenuDialog}
-              aria-labelledby="menu-dialog-title"
-              aria-describedby="menu-dialog-description"
-            >
-              <DialogTitle id="menu-dialog-title">
-                <Grid container>
-                  <Grid item xs={6}>
-                    New Menu
-                  </Grid>
-                  <Grid item xs={6}>
-                    <div className={classes.buttonContainer}>
-                      <Button color="secondary" disabled={!_.isNumber(this.state.menuIndex)} onClick={this.handleDeleteMenu}>
-                        Delete
-                      </Button>
-                    </div>
-                  </Grid>
-                </Grid>
-              </DialogTitle>
-              <DialogContent id="menu-dialog-description">
-                <Grid container spacing={40}>
-                  <Grid item xs={6}>
-                    <TextField fullWidth id="newMenuName" label="Name" margin="normal" name="newMenuName" onChange={this.handleChange} value={this.state.newMenuName} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField fullWidth id="newMenuPrice" label="Price" margin="normal" name="newMenuPrice" onChange={this.handleChange} value={this.state.newMenuPrice} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth >
-                      <FormLabel component="label">Hot</FormLabel>
-                      <Switch
-                        color="primary"
-                        checked={this.state.newMenuIsHot}
-                        onChange={this.handleMenuSwitch('newMenuIsHot')}
-                        value="newMenuIsHot"
-                        />
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth >
-                      <FormLabel component="label">New</FormLabel>
+                </DialogTitle>
+                <DialogContent id="menu-dialog-description">
+                  <Grid container spacing={40}>
+                    <Grid item xs={6}>
+                      <TextField fullWidth id="newMenuName" label="Name" margin="normal" name="newMenuName" onChange={this.handleChange} value={this.state.newMenuName} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <TextField fullWidth id="newMenuPrice" label="Price" margin="normal" name="newMenuPrice" onChange={this.handleChange} value={this.state.newMenuPrice} />
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth >
+                        <FormLabel component="label">Hot</FormLabel>
                         <Switch
                           color="primary"
-                          checked={this.state.newMenuIsNew}
-                          onChange={this.handleMenuSwitch('newMenuIsNew')}
-                          value="newMenuIsNew"
+                          checked={this.state.newMenuIsHot}
+                          onChange={this.handleMenuSwitch('newMenuIsHot')}
+                          value="newMenuIsHot"
                           />
-                    </FormControl>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <FormControl fullWidth >
+                        <FormLabel component="label">New</FormLabel>
+                          <Switch
+                            color="primary"
+                            checked={this.state.newMenuIsNew}
+                            onChange={this.handleMenuSwitch('newMenuIsNew')}
+                            value="newMenuIsNew"
+                            />
+                      </FormControl>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </DialogContent>
-              <DialogActions>
-                <Button color="primary" onClick={this.handleAddNewMenu} disabled={!(this.state.newMenuName && this.state.newMenuPrice)}>
-                  Save
-                </Button>
-                <Button color="primary" onClick={this.handleCloseAddMenuDialog}>
-                  Close
-                </Button>
-              </DialogActions>
-            </Dialog>
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary" onClick={this.handleAddNewMenu} disabled={!(this.state.newMenuName && this.state.newMenuPrice)}>
+                    Save
+                  </Button>
+                  <Button onClick={this.handleCloseAddMenuDialog}>
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
-            <Dialog fullWidth
-              open={this.state.reportDialogOpen}
-              onClose={this.handleCloseReportDialog}
-              aria-labelledby="report-dialog-title"
-              aria-describedby="report-dialog-description"
-            >
-              <DialogTitle id="report-dialog-title">
-                <Grid container>
-                  <Grid item xs={6}>
-                    Report
+              <Dialog fullWidth
+                open={this.state.reportDialogOpen}
+                onClose={this.handleCloseReportDialog}
+                aria-labelledby="report-dialog-title"
+                aria-describedby="report-dialog-description"
+              >
+                <DialogTitle id="report-dialog-title">
+                  <Grid container>
+                    <Grid item xs={6}>
+                      Report
+                    </Grid>
+                    <Grid item xs={6}>
+                      <div className={classes.buttonContainer}>
+                        <Button color="secondary" onClick={this.handleDeleteReport}>
+                          Delete
+                        </Button>
+                      </div>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={6}>
-                    <div className={classes.buttonContainer}>
-                      <Button color="secondary" onClick={this.handleDeleteReport}>
-                        Delete
-                      </Button>
-                    </div>
-                  </Grid>
-                </Grid>
-              </DialogTitle>
-              <DialogContent id="report-dialog-description">
-                <Typography variant="body1">
-                  {this.state.reportContent}
-                </Typography>
-              </DialogContent>
-              <DialogActions>
-                <Button color="primary" >
-                  Save
-                </Button>
-                <Button color="primary" onClick={this.handleCloseReportDialog}>
-                  Close
-                </Button>
-              </DialogActions>
-            </Dialog>
+                </DialogTitle>
+                <DialogContent id="report-dialog-description">
+                  <Typography variant="body1">
+                    {this.state.reportContent}
+                  </Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary">
+                    Save
+                  </Button>
+                  <Button onClick={this.handleCloseReportDialog}>
+                    Close
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
-            <ConfirmationDialog
-              open={this.state.confirmationDialogOpen}
-              handleClose={this.handleCloseConfirmationDialog}
-              operation={this.handleDeleteBusiness}
-              title="Warning"
-              content="Are your sure to delete the business?"
-            />
-          </div>)}
+              <ConfirmationDialog
+                open={this.state.confirmationDialogOpen}
+                handleClose={this.handleCloseConfirmationDialog}
+                operation={this.handleDeleteBusiness}
+                title="Warning"
+                content="Are your sure to delete the business?"
+              />
+
+            </div>
+          </div>
       </SettingContainer>
     );
   }

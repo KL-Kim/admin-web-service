@@ -74,138 +74,139 @@ class SingleBusinessPage extends Component {
     return (
       <Container>
         {
-          _.isEmpty(business) ? <div></div> :
-          <div>
-            <Grid container spacing={16}>
-              <Grid item xs={4}>
-                <Img src={thumbnail} className={classes.thumbnail} />
-              </Grid>
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Grid container alignItems="center">
-                    <Grid item xs={6}>
-                      <Typography type="display1" color="primary">{business.krName}</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <div className={classes.buttonContainer}>
-                        <Tooltip id="favor-icon" title="Add to Favor">
-                          <IconButton color='default'>
-                            <FavoriteBorder />
-
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip id="report-icon" title="Report">
-                          <IconButton>
-                            <ErrorOutline />
-                          </IconButton>
-                        </Tooltip>
-                      </div>
-                    </Grid>
+          _.isEmpty(business) 
+            ? null 
+            : <div>
+                <Grid container spacing={16}>
+                  <Grid item xs={4}>
+                    <Img src={thumbnail} className={classes.thumbnail} />
                   </Grid>
-                  <Typography type="body1" gutterBottom>{business.cnName}</Typography>
-                  <Stars count={5} size={24} value={business.ratingAverage} edit={false} />
-                    <Typography type="body2">{business.category.krName}</Typography>
-                  <Typography type="body1">Tel: {business.tel}</Typography>
-                  <Typography type="body1">{business.address.area.name + ' ' + business.address.street}</Typography>
-                </Paper>
-              </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Grid container alignItems="center">
+                        <Grid item xs={6}>
+                          <Typography type="display1" color="primary">{business.krName}</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <div className={classes.buttonContainer}>
+                            <Tooltip id="favor-icon" title="Add to Favor">
+                              <IconButton color='default'>
+                                <FavoriteBorder />
 
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>지도</Typography>
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip id="report-icon" title="Report">
+                              <IconButton>
+                                <ErrorOutline />
+                              </IconButton>
+                            </Tooltip>
+                          </div>
+                        </Grid>
+                      </Grid>
+                      <Typography type="body1" gutterBottom>{business.cnName}</Typography>
+                      <Stars count={5} size={24} value={business.ratingAverage} edit={false} />
+                        <Typography type="body2">{business.category.krName}</Typography>
+                      <Typography type="body1">Tel: {business.tel}</Typography>
+                      <Typography type="body1">{business.address.area.name + ' ' + business.address.street}</Typography>
+                    </Paper>
+                  </Grid>
 
-                </Paper>
-              </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>지도</Typography>
 
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="display1" gutterBottom>More</Typography>
-                  <Typography type="body1" gutterBottom>가격: {business.priceRange}</Typography>
-                  <Typography type="body1" gutterBottom>배달: {business.delivery}</Typography>
-                  <Typography type="body1" gutterBottom>언어: {business.supportedLanguage}</Typography>
-                  <Typography type="body1" gutterBottom>Payments: {business.payment}</Typography>
-                  <Typography type="body1" gutterBottom>휴식일: {business.rest}</Typography>
-                </Paper>
-              </Grid>
+                    </Paper>
+                  </Grid>
 
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>분점</Typography>
-                  {business.chains.map(item =>
-                    (<Link to={item.enName} key={item.enName}>
-                      <Typography type="body1">{item.krName}</Typography>
-                    </Link>)
-                  )}
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>영업시간</Typography>
-                  <Typography type="body1" gutterBottom>월요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.mon}</Typography>
-                  <Typography type="body1" gutterBottom>화요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.tue}</Typography>
-                  <Typography type="body1" gutterBottom>수요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.wed}</Typography>
-                  <Typography type="body1" gutterBottom>목요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.thu}</Typography>
-                  <Typography type="body1" gutterBottom>금요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.fri}</Typography>
-                  <Typography type="body1" gutterBottom>토요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.sat}</Typography>
-                  <Typography type="body1" gutterBottom>일요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.sun}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>Description</Typography>
-                  <Typography type="body1" gutterBottom>{business.description}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>Event</Typography>
-                  <Typography type="body1" gutterBottom>{business.event}</Typography>
-                </Paper>
-              </Grid>
-              <Grid item xs={4}>
-                <Paper className={classes.paper}>
-                  <Typography type="title" gutterBottom>Menu</Typography>
-                  {
-                    <Table className={classes.table}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Name</TableCell>
-                          <TableCell>Price</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {
-                          _.isEmpty(business.menu) ? (<TableRow></TableRow>)
-                          : business.menu.map((item, index) => {
-                              let name;
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="display1" gutterBottom>More</Typography>
+                      <Typography type="body1" gutterBottom>가격: {business.priceRange}</Typography>
+                      <Typography type="body1" gutterBottom>배달: {business.delivery}</Typography>
+                      <Typography type="body1" gutterBottom>언어: {business.supportedLanguage}</Typography>
+                      <Typography type="body1" gutterBottom>Payments: {business.payment}</Typography>
+                      <Typography type="body1" gutterBottom>휴식일: {business.rest}</Typography>
+                    </Paper>
+                  </Grid>
 
-                              if (item.hot) {
-                                name = <Badge color="secondary" badgeContent={<Whatshot />}>
-                                    <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
-                                  </Badge>
-                              } else if (item.new) {
-                                name = <Badge color="primary" badgeContent="New">
-                                    <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
-                                  </Badge>
-                              } else {
-                                name = <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
-                              }
-
-                            return (<TableRow hover key={index}>
-                              <TableCell>
-                                {name}
-                              </TableCell>
-                              <TableCell>{item.price}</TableCell>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>분점</Typography>
+                      {business.chains.map(item =>
+                        (<Link to={item.enName} key={item.enName}>
+                          <Typography type="body1">{item.krName}</Typography>
+                        </Link>)
+                      )}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>영업시간</Typography>
+                      <Typography type="body1" gutterBottom>월요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.mon}</Typography>
+                      <Typography type="body1" gutterBottom>화요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.tue}</Typography>
+                      <Typography type="body1" gutterBottom>수요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.wed}</Typography>
+                      <Typography type="body1" gutterBottom>목요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.thu}</Typography>
+                      <Typography type="body1" gutterBottom>금요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.fri}</Typography>
+                      <Typography type="body1" gutterBottom>토요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.sat}</Typography>
+                      <Typography type="body1" gutterBottom>일요일: {_.isEmpty(business.openningHoursSpec) ? '' : business.openningHoursSpec.sun}</Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>Description</Typography>
+                      <Typography type="body1" gutterBottom>{business.description}</Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>Event</Typography>
+                      <Typography type="body1" gutterBottom>{business.event}</Typography>
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.paper}>
+                      <Typography type="title" gutterBottom>Menu</Typography>
+                      {
+                        <Table className={classes.table}>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Name</TableCell>
+                              <TableCell>Price</TableCell>
                             </TableRow>
-                          )})
-                        }
-                      </TableBody>
-                    </Table>
-                  }
-                </Paper>
-              </Grid>
-            </Grid>
-          </div>
+                          </TableHead>
+                          <TableBody>
+                            {
+                              _.isEmpty(business.menu) ? (<TableRow></TableRow>)
+                              : business.menu.map((item, index) => {
+                                  let name;
+
+                                  if (item.hot) {
+                                    name = <Badge color="secondary" badgeContent={<Whatshot />}>
+                                        <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
+                                      </Badge>
+                                  } else if (item.new) {
+                                    name = <Badge color="primary" badgeContent="New">
+                                        <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
+                                      </Badge>
+                                  } else {
+                                    name = <Typography type="body1" className={classes.badgeContent}>{item.name}</Typography>
+                                  }
+
+                                return (<TableRow hover key={index}>
+                                  <TableCell>
+                                    {name}
+                                  </TableCell>
+                                  <TableCell>{item.price}</TableCell>
+                                </TableRow>
+                              )})
+                            }
+                          </TableBody>
+                        </Table>
+                      }
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </div>
         }
       </Container>
     );

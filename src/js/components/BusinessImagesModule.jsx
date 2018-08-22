@@ -22,15 +22,12 @@ import AddPhoto from '@material-ui/icons/AddAPhoto';
 // Custom Components
 import ConfirmationDialog from './utils/ConfirmationDialog';
 
-import config from '../config/config';
-
 const styles = (theme) => ({
   "container": {
-    marginBottom: theme.spacing.unit,
+    marginBottom: theme.spacing.unit * 2,
   },
   "paper": {
-    padding: theme.spacing.unit * 3,
-    marginBottom: theme.spacing.unit * 2,
+    padding: theme.spacing.unit * 4,
   },
   "dropZone": {
     width: '100%',
@@ -48,14 +45,6 @@ const styles = (theme) => ({
   "media": {
     width: '100%',
     height: 150,
-  },
-  "buttonContainer": {
-    "display": "flex",
-    justifyContent: "center"
-  },
-  "button": {
-    "margin": theme.spacing.unit,
-    "width": 150,
   },
   "imageContainer": {
     position: 'relative',
@@ -82,6 +71,11 @@ const styles = (theme) => ({
   "imageButton": {
     color: "white",
     opacity: 1,
+  },
+  "imageInfo": {
+    width: "100%",
+    height: 100,
+    backgroundColor: theme.palette.background.default,
   }
 });
 
@@ -90,19 +84,20 @@ class BusinessImagesModule extends Component {
     super(props)
 
     this.state = {
-      thumbnail: [],
+      main: [],
       images: [],
       LightboxOpen: false,
       currentImage: 0,
       confirmationDialogOpen: false,
-      willBeDeleted: '',
+      imageId: '',
     };
 
-    this.onDropThumbnail = this.onDropThumbnail.bind(this);
-    this.onDropImages = this.onDropImages.bind(this);
+    this.handleDropMain = this.handleDropMain.bind(this);
+    this.handleDropImages = this.handleDropImages.bind(this);
     this.handleDeleteNewImage = this.handleDeleteNewImage.bind(this);
-    this.handleClear = this.handleClear.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClearGallery = this.handleClearGallery.bind(this);
+    this.handleSubmitMain = this.handleSubmitMain.bind(this);
+    this.handleSubmitGallery = this.handleSubmitGallery.bind(this);
     this.handleOpenLightbox = this.handleOpenLightbox.bind(this);
     this.gotoPrevLightboxImage = this.gotoPrevLightboxImage.bind(this);
     this.gotoNextLightboxImage = this.gotoNextLightboxImage.bind(this);
@@ -113,13 +108,13 @@ class BusinessImagesModule extends Component {
     this.handleDeleteUploadedImage = this.handleDeleteUploadedImage.bind(this);
   }
 
-  onDropThumbnail(acceptedFiles) {
+  handleDropMain(acceptedFiles) {
     this.setState({
-      thumbnail: acceptedFiles
+      main: acceptedFiles
     });
   }
 
-  onDropImages(acceptedFiles) {
+  handleDropImages(acceptedFiles) {
     this.setState({
       images:  this.state.images.concat(acceptedFiles)
     });
@@ -130,33 +125,15 @@ class BusinessImagesModule extends Component {
     images.splice(index, 1);
 
     this.setState({
-      images: images.slice()
+      images: [...images]
     });
   }
 
-  handleClear() {
+  handleClearGallery() {
     this.setState({
-      thumbnail: [],
+      main: [],
       images: [],
     });
-  }
-
-  handleSubmit() {
-    if (this.props.id) {
-      let formData = new FormData();
-
-      if(!_.isEmpty(this.state.thumbnail)) {
-        formData.append("thumbnail", this.state.thumbnail[0], this.state.thumbnail[0].name);
-      }
-
-      if(!_.isEmpty(this.state.images)) {
-        this.state.images.map(image => formData.append("images", image, image.name));
-      }
-
-      this.props.handleUpload(this.props.id, formData).then(response => {
-        this.props.updateBusinessImages(response);
-      });
-    }
   }
 
   handleOpenLightbox = index => e => {
@@ -190,24 +167,62 @@ class BusinessImagesModule extends Component {
     });
   }
 
-  hanldeOpenDeleteDialog = image => e => {
+  hanldeOpenDeleteDialog = id => e => {
     this.setState({
       confirmationDialogOpen: true,
-      willBeDeleted: image,
+      imageId: id,
     });
   }
 
   hanldeCloseDeleteDialog() {
     this.setState({
       confirmationDialogOpen: false,
-      willBeDeleted: false,
+      imageId: '',
     });
   }
 
   handleDeleteUploadedImage() {
-    this.props.handleDelete(this.props.id, { image: this.state.willBeDeleted }).then(response => {
-      this.props.updateBusinessImages(response);
-    });
+    if (!_.isEmpty(this.props.businessId) && !_.isEmpty(this.state.imageId)) {
+      this.props.handleDelete(this.props.businessId, { imageId: this.state.imageId })
+        .then(response => {
+          if (response) {
+            this.props.updateBusiness();
+            this.hanldeCloseDeleteDialog();
+          }
+        });
+    }
+  }
+
+  handleSubmitMain() {
+    if (this.props.businessId && !_.isEmpty(this.state.main)) {
+      let formData = new FormData();
+      formData.append("main", this.state.main[0], this.state.main[0].name);      
+
+      this.props.handleUpload(this.props.businessId, formData)
+        .then(response => {
+          if (response) {
+            this.props.updateBusiness();
+          }
+        });
+    }
+  }
+
+  handleSubmitGallery() {
+    if (this.props.businessId && !_.isEmpty(this.state.images)) {
+      let formData = new FormData();
+      this.state.images.map(image => formData.append("gallery", image, image.name));
+
+      this.props.handleUpload(this.props.businessId, formData)
+        .then(response => {
+          if (response) {
+            this.props.updateBusiness();
+
+            this.setState({
+              images: [],
+            });
+          }
+        });
+    }
   }
 
   render() {
@@ -215,82 +230,127 @@ class BusinessImagesModule extends Component {
 
     let uploadedImages = [];
 
-    if (!_.isEmpty(this.props.imagesUri)) {
-      this.props.imagesUri.map(image =>
+    if (!_.isEmpty(this.props.gallery)) {
+      this.props.gallery.map(image =>
         uploadedImages.push({
-          src: config.API_GATEWAY_ROOT + '/' + image
+          src: image.url
         })
       );
     }
 
     return (
-      <Paper className={classes.paper}>
-        <Grid container spacing={16} className={classes.container}>
-          <Grid item xs={12}>
-            <Typography type="display1" gutterBottom>Thumbnail & Images</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Dropzone
-              multiple={false}
-              accept="image/*"
-              onDrop={this.onDropThumbnail}
-              className={classes.dropZone}
-            >
-              {
-                _.isEmpty(this.state.thumbnail)
-                  ? <div>
-                      <AddPhoto style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        width: 50,
-                        height: 50,
-                        transform: 'translate(-50%, -50%)',
-                        opacity: 0.5,
-                        }}
-                      />
-                    {
-                      _.isEmpty(this.props.thumbnailUri.hd)
-                      ? <Typography type="title">Add Thumbnail</Typography>
-                      : <Img src={config.API_GATEWAY_ROOT + '/' + this.props.thumbnailUri.hd + '?thumbnail&t=' + Date.now()} className={classes.image} />
-                    }
-                    </div>
-                  : <Img src={this.state.thumbnail[0].preview} className={classes.image} />
-              }
-            </Dropzone>
-          </Grid>
+      <div>
+        <Typography variant="display1" gutterBottom>Images</Typography>
+      
+        <div className={classes.container}>
+          <Paper className={classes.paper}>
+            <Typography variant="title" gutterBottom>Main Photo</Typography>
 
-          <Grid item xs={12}>
-            <Typography type="display1" gutterBottom>Uploaded Images</Typography>
-          </Grid>
+            <Grid container spacing={16}>
+              <Grid item xs={6}>
+                <Img 
+                  className={classes.image} 
+                  src={this.props.mainImage.url} 
+                  loader={<Typography className={classes.imageInfo}>Loading...</Typography>}
+                  unloader={<Typography className={classes.imageInfo}>404 Not found</Typography>}
+                />
+              </Grid>
 
-          <Grid item xs={12}>
+              <Grid item xs={4}>
+                <Dropzone
+                  multiple={false}
+                  accept="image/*"
+                  onDrop={this.handleDropMain}
+                  className={classes.dropZone}
+                >
+                  {
+                    _.isEmpty(this.state.main)
+                      ? <div>
+                          <AddPhoto style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            width: 50,
+                            height: 50,
+                            transform: 'translate(-50%, -50%)',
+                            opacity: 0.5,
+                            }}
+                          />
+                          <Typography type="title">Add Main Image</Typography>
+                        </div>
+                      : <Img src={this.state.main[0].preview} className={classes.image} />
+                  }
+                </Dropzone>
+              </Grid>
+            </Grid>
+
+            <br />
+
+            <Grid container justify="center">
+              <Grid item>
+                <Button 
+                  variant="raised" 
+                  color="primary"
+                  disabled={_.isEmpty(this.props.businessId) || _.isEmpty(this.state.main)}
+                  onClick={this.handleSubmitMain}
+                >
+                  Upload Main
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+        </div>
+
+        <div className={classes.container}>
+          <Paper className={classes.paper}>
+            <Typography variant="title" gutterBottom>Galley</Typography>
+                      
             <Grid container spacing={16}>
               {
-                _.isEmpty(this.props.imagesUri) ? ''
-                : this.props.imagesUri.map((image, index) =>
-                    <Grid item xs={3} key={index}>
-                      <div className={classes.imageContainer}>
-                        <div className={classes.imageButtonContainer}>
-                          <Button disableRipple disableFocusRipple className={classes.imageButton} onClick={this.handleOpenLightbox(index)}>View</Button>
-                          <Button disableRipple disableFocusRipple className={classes.imageButton} onClick={this.hanldeOpenDeleteDialog(image)}>Delete</Button>
+                _.isEmpty(this.props.gallery)
+                  ? <Typography>None</Typography>
+                  : this.props.gallery.map((image, index) =>
+                      <Grid item xs={3} key={image._id}>
+                        <div className={classes.imageContainer}>
+                          <div className={classes.imageButtonContainer}>
+                            <Button 
+                              disableRipple 
+                              disableFocusRipple 
+                              className={classes.imageButton} 
+                              onClick={this.handleOpenLightbox(index)}
+                            >
+                              View
+                            </Button>
+                            <Button 
+                              disableRipple 
+                              disableFocusRipple 
+                              className={classes.imageButton} 
+                              onClick={this.hanldeOpenDeleteDialog(image._id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                          <Img 
+                            className={classes.image} 
+                            src={image.url} 
+                            loader={<Typography>Loading...</Typography>}
+                            unloader={<Typography className={classes.imageInfo}>404 Not found</Typography>}
+                          />
                         </div>
-                        <Img src={config.API_GATEWAY_ROOT + '/' + image + '?images&t=' + Date.now()} className={classes.image} />
-                      </div>
-                    </Grid>
-                  )
+                      </Grid>
+                    )
               }
             </Grid>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Typography type="display1" gutterBottom>New Images</Typography>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Grid container spacing={16}>
-              {
-                _.isEmpty(this.state.images) ? ''
+          </Paper>
+        </div>
+        
+        <div className={classes.container}>
+          <Typography variant="title" gutterBottom>New Images</Typography>
+        
+          <Grid container spacing={16}>
+            {
+              _.isEmpty(this.state.images) 
+                ? null
                 : this.state.images.map((image, index) =>
                     <Grid item xs={3} key={index}>
                       <Card className={classes.card}>
@@ -308,80 +368,89 @@ class BusinessImagesModule extends Component {
                       </Card>
                     </Grid>
                   )
-              }
-              <Grid item xs={3}>
-                <Dropzone
-                  multiple={true}
-                  accept="image/*"
-                  onDrop={this.onDropImages}
-                  className={classes.dropZone}
-                >
-                  <AddPhoto style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    width: 50,
-                    height: 50,
-                    transform: 'translate(-50%, -50%)',
-                    opacity: 0.5,
-                    }}
-                  />
-                  <Typography type="title">Add images</Typography>
-                </Dropzone>
-              </Grid>
+            }
+            <Grid item xs={3}>
+              <Dropzone
+                multiple={true}
+                accept="image/*"
+                onDrop={this.handleDropImages}
+                className={classes.dropZone}
+              >
+                <AddPhoto style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: 50,
+                  height: 50,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: 0.5,
+                  }}
+                />
+                <Typography type="title">Add to Gallery</Typography>
+              </Dropzone>
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
-            <div className={classes.buttonContainer}>
-              <Button variant="raised" color="primary"
-                className={classes.button}
-                disabled={_.isEmpty(this.props.id) || (_.isEmpty(this.state.thumbnail) && _.isEmpty(this.state.images))}
-                onClick={this.handleSubmit}
+          <br />
+
+          <Grid container justify="center" spacing={16}>
+            <Grid item>
+              <Button 
+                variant="raised" 
+                color="primary"
+                disabled={_.isEmpty(this.props.businessId) || _.isEmpty(this.state.images)}
+                onClick={this.handleSubmitGallery}
               >
-                Upload
+                Upload Gallery
               </Button>
-              <Button className={classes.button}
-                onClick={this.handleClear}
+            </Grid>
+
+            <Grid item>
+              <Button
+                onClick={this.handleClearGallery}
               >
                 Reset
               </Button>
-            </div>
+            </Grid>
           </Grid>
-        </Grid>
+        </div>
+        
+        <div>
+          <Lightbox
+            currentImage={this.state.currentImage}
+            images={uploadedImages}
+            showThumbnails={true}
+            showImageCount={false}
+            isOpen={this.state.LightboxOpen}
+            onClickPrev={this.gotoPrevLightboxImage}
+            onClickNext={this.gotoNextLightboxImage}
+            onClickThumbnail={this.gotoImage}
+            onClose={this.handleCloseLightbox}
+          />
 
-        <Lightbox
-          currentImage={this.state.currentImage}
-          images={uploadedImages}
-          showThumbnails={true}
-          showImageCount={false}
-          isOpen={this.state.LightboxOpen}
-          onClickPrev={this.gotoPrevLightboxImage}
-          onClickNext={this.gotoNextLightboxImage}
-          onClickThumbnail={this.gotoImage}
-          onClose={this.handleCloseLightbox}
-        />
-
-        <ConfirmationDialog
-          open={this.state.confirmationDialogOpen}
-          handleClose={this.hanldeCloseDeleteDialog}
-          operation={this.handleDeleteUploadedImage}
-          title="Warning"
-          content="Are your sure to delete the image?"
-        />
-      </Paper>
+          <ConfirmationDialog
+            open={this.state.confirmationDialogOpen}
+            handleClose={this.hanldeCloseDeleteDialog}
+            operation={this.handleDeleteUploadedImage}
+            title="Warning"
+            content="Are your sure to delete the image?"
+          />
+        </div>
+      </div>
     );
   }
 }
 
 BusinessImagesModule.propTypes = {
   "classes": PropTypes.object.isRequired,
-  "id": PropTypes.string.isRequired,
-  "thumbnailUri": PropTypes.object.isRequired,
-  "imagesUri": PropTypes.array.isRequired,
+  "businessId": PropTypes.string.isRequired,
+  "mainImage": PropTypes.object.isRequired,
+  "gallery": PropTypes.array.isRequired,
+
+  // Methods
   "handleUpload": PropTypes.func.isRequired,
   "handleDelete": PropTypes.func.isRequired,
-  "updateBusinessImages": PropTypes.func.isRequired,
+  "updateBusiness": PropTypes.func.isRequired,
 }
 
 export default withStyles(styles)(BusinessImagesModule);

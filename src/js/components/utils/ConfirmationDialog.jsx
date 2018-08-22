@@ -42,17 +42,19 @@ class ConfirmationDialog extends Component {
         <DialogTitle id="alert-dialog-title">
           {this.props.title}
         </DialogTitle>
+
         <DialogContent>
           <DialogContentText id="alert-dialog-description" >
             {this.props.content}
           </DialogContentText>
         </DialogContent>
+
         <DialogActions>
+          <Button onClick={this.props.handleClose} className={classes.button}>
+            Cancel
+          </Button>
           <Button color="primary" variant="raised" onClick={this.handleSubmit} className={classes.button}>
             Ok
-          </Button>
-          <Button color="primary" onClick={this.props.handleClose} className={classes.button}>
-            Cancel
           </Button>
         </DialogActions>
       </Dialog>
