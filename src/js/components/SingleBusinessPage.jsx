@@ -189,7 +189,7 @@ class SingleBusinessPage extends Component {
       "monthViewsCount": 0,
       "favoredCount": 0,
       reviewsCount: 0,
-      "event": null,
+      "event": '',
       "menu": [],
       "reports": [],
       mainImage: {},
@@ -851,14 +851,23 @@ class SingleBusinessPage extends Component {
           <div>
             <Grid container spacing={24} alignItems="center">
               <Grid item xs={6}>
-                <Typography variant="display1" gutterBottom className={classes.title}>{this.state.krName + ' - ' + this.state.cnName}</Typography>
-                {
-                  this.state.reports.length > 0
-                    ? <Badge color="secondary" badgeContent={this.state.reports.length}>
-                        <Typography>Reports</Typography>
-                      </Badge>
-                    : null
-                }
+                <Grid container spacing={16} alignItems="center">
+                  <Grid item>
+                    <Typography variant="display1" className={classes.title}>{this.state.krName + ' - ' + this.state.cnName}</Typography>
+                  </Grid>
+
+                  <Grid item>
+                    {
+                      this.state.reports.length > 0
+                        ? <Chip
+                            color="secondary"
+                            label={this.state.reports.length + " reports"}
+                          />
+                        : null
+
+                    }
+                  </Grid>
+                </Grid>
               </Grid>
 
               <Grid item xs={6}>
@@ -1418,7 +1427,6 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <Typography variant="title" gutterBottom>Description</Typography>
@@ -1505,7 +1513,6 @@ class SingleBusinessPage extends Component {
                 </Paper>
               </Grid>
 
-
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
                   <Typography variant="title">Reports</Typography>
@@ -1514,21 +1521,22 @@ class SingleBusinessPage extends Component {
                     <TableRow>
                       <TableCell>Index</TableCell>
                       <TableCell>Checked</TableCell>
-                      <TableCell>Content</TableCell>
+                      <TableCell>Type</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {
-                      _.isEmpty(this.state.reports) ? (<TableRow></TableRow>)
-                      : this.state.reports.map((item, index) => (
-                        <TableRow hover key={index}
-                          onClick={event => this.handleReportsRowClick(event, item, index)}
-                        >
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{item.checked ? 'Yes' : 'No'}</TableCell>
-                          <TableCell>{item.content}</TableCell>
-                        </TableRow>
-                      ))
+                      _.isEmpty(this.state.reports) 
+                        ? (<TableRow></TableRow>)
+                        : this.state.reports.map((item, index) => (
+                          <TableRow hover key={index}
+                            onClick={event => this.handleReportsRowClick(event, item, index)}
+                          >
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{item.checked ? 'Yes' : 'No'}</TableCell>
+                            <TableCell>{item.type}</TableCell>
+                          </TableRow>
+                        ))
                     }
                   </TableBody>
                 </Table>
@@ -1536,15 +1544,17 @@ class SingleBusinessPage extends Component {
               </Grid>
             </Grid>
 
-            <BusinessImagesModule
-              businessId={this.state._id}
-              mainImage={this.state.mainImage}
-              gallery={this.state.gallery}
+            <div>
+              <BusinessImagesModule
+                businessId={this.state._id}
+                mainImage={this.state.mainImage}
+                gallery={this.state.gallery}
 
-              handleUpload={this.props.uploadImages}
-              handleDelete={this.props.deleteImage}
-              updateBusiness={this.getNewData}
-            />
+                handleUpload={this.props.uploadImages}
+                handleDelete={this.props.deleteImage}
+                updateBusiness={this.getNewData}
+              />
+            </div>
 
             <div>
               <Dialog fullWidth
