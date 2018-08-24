@@ -781,7 +781,7 @@ class SingleBusinessPage extends Component {
       }
 
       // Set business category id
-      if (this.state.category) {
+      if (!_.isEmpty(this.state.category)) {
         data.category = this.state.category._id;
       }
 
@@ -827,8 +827,8 @@ class SingleBusinessPage extends Component {
         data.geo = {
           type: "Point",
           coordinates: [
-            _.isEmpty(this.state.geo.lat) ? 0 : this.state.geo.lat,
-            _.isEmpty(this.state.geo.long) ? 0 : this.state.geo.long,
+            this.state.geo.lat,
+            this.state.geo.long,
           ],
         }
       }
