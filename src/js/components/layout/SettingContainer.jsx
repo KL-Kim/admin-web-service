@@ -8,7 +8,6 @@ import Header from './Header';
 import SettingFooter from './SettingFooter';
 import Sidebar from './Sidebar';
 import Alert from '../utils/Alert';
-import DevTools from '../utils/DevTools';
 
 import { logout } from '../../actions/user.actions';
 
@@ -56,7 +55,7 @@ class SettingContainer extends Component {
           logout={logout}
           updatedAt={updatedAt}
         />
-        <Sidebar user={user} match={this.props.match}/>
+        <Sidebar user={user} match={this.props.match} />
         <div className={classes.appFrame}>
           <main className={classes.content}>
             {this.props.children}
@@ -64,7 +63,6 @@ class SettingContainer extends Component {
           </main>
         </div>
         <Alert />
-        <DevTools />
       </div>
     );
   }

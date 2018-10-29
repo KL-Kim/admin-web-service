@@ -20,6 +20,8 @@ import Group from '@material-ui/icons/Group';
 import Business from '@material-ui/icons/Business';
 import Restaurant from '@material-ui/icons/Restaurant';
 import Loyalty from '@material-ui/icons/Loyalty';
+import Error from '@material-ui/icons/Error';
+import Search from '@material-ui/icons/Search';
 
 // Custom Components
 import LinkContainer from '../utils/LinkContainer';
@@ -76,6 +78,36 @@ class Sidebar extends Component {
                     <Notifications />
                   </ListItemIcon>
                   <ListItemText primary="Notifications" classes={match.path === "/notification" ? { primary: classes.selected } : {}} />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/error",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem selected={match.path === "/error"}>
+                  <ListItemIcon>
+                    <Error />
+                  </ListItemIcon>
+                  <ListItemText primary="Errors" classes={match.path === "/error" ? { primary: classes.selected } : {}} />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/query",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem selected={match.path === "/query"}>
+                  <ListItemIcon>
+                    <Search />
+                  </ListItemIcon>
+                  <ListItemText primary="Queries" classes={match.path === "/query" ? { primary: classes.selected } : {}} />
                 </MenuItem>
               </LinkContainer>
 

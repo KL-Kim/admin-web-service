@@ -348,7 +348,7 @@ class BusinessList extends Component {
                       }} key={index}
                     >
                       <TableRow hover >
-                        <TableCell>{index+1}</TableCell>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell>
                           {
                             (business.reports.length > 0)

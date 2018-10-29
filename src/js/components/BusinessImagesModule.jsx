@@ -110,7 +110,7 @@ class BusinessImagesModule extends Component {
 
   handleDropMain(acceptedFiles) {
     this.setState({
-      main: acceptedFiles
+      main: [...acceptedFiles]
     });
   }
 
@@ -246,7 +246,7 @@ class BusinessImagesModule extends Component {
           <Paper className={classes.paper}>
             <Typography variant="title" gutterBottom>Main Photo</Typography>
 
-            <Grid container spacing={16}>
+            <Grid container spacing={24}>
               <Grid item xs={6}>
                 <Img 
                   className={classes.image} 
@@ -256,7 +256,7 @@ class BusinessImagesModule extends Component {
                 />
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <Dropzone
                   multiple={false}
                   accept="image/*"

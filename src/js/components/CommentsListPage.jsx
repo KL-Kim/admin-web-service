@@ -262,6 +262,7 @@ class CommentsList extends Component {
               </Paper>
             </Grid>
           </Grid>
+          
           <Dialog fullWidth
             open={this.state.editDialogOpen}
             onClose={this.handleDialogClose}

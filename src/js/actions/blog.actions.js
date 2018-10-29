@@ -9,10 +9,11 @@ import blogTypes from '../constants/blog.types';
 import {
   fetchPostsList,
   addNewPostFetch,
+  uploadPostImagesFetch,
   updatePostFetch,
   fetchSinglePost,
   deletePostFetch,
-  editPostStateFetch
+  editPostStateFetch,
 } from '../api/blog.service';
 
 /**
@@ -47,7 +48,10 @@ export const getPostsList = (params) => {
   return (dispatch, getState) => {
     dispatch(_getPostsListRequest());
 
-    return fetchPostsList(params)
+    return getToken()
+      .then(token => {
+        return fetchPostsList(token, params);
+      })
       .then(response => {
         dispatch(_getPostsListSuccess(response));
 
@@ -160,6 +164,50 @@ export const addNewPost = (params) => {
         return ;
       });
   };
+}
+
+export const uploadPostImages = (id, data) => {
+  const _uploadPostImagesRequset = () => ({
+    "type": blogTypes.UPLOAD_POST_IMAGES_REQUEST,
+    "meta": {},
+    "error": null,
+    "payload": {}
+  });
+
+  const _uploadPostImagesSuccess = () => ({
+    "type": blogTypes.UPLOAD_POST_IMAGES_SUCCESS,
+    "meta": {},
+    "error": null,
+    "payload": {}
+  });
+
+  const _uploadPostImagesFailure = (err) => ({
+    "type": blogTypes.UPLOAD_POST_IMAGES_FAILURE,
+    "meta": {},
+    "error": err,
+    "payload": {}
+  });
+
+  return (dispatch, getState) => {
+    dispatch(_uploadPostImagesRequset());
+
+    return getToken()
+      .then(token => {
+        return uploadPostImagesFetch(token, id, data);
+      })
+      .then(res => {
+        dispatch(_uploadPostImagesSuccess());
+        dispatch(AlertActions.alertSuccess("Uploaded!"));
+
+        return res;
+      })
+      .catch(err => {
+        dispatch(_uploadPostImagesFailure(err));
+        dispatch(AlertActions.alertFailure(err.message));
+
+        return ;
+      });
+  }
 }
 
 

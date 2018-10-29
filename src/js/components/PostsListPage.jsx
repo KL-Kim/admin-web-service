@@ -41,6 +41,7 @@ import ElapsedTime from '../helpers/ElapsedTime';
 
 // Actions
 import { getPostsList, updatePostState } from '../actions/blog.actions';
+import LinkContainer from './utils/LinkContainer';
 
 const styles = (theme) => ({
 
@@ -152,9 +153,25 @@ class BlogList extends Component {
     return (
       <SettingContainer>
         <div>
-          <Typography variant="display1" gutterBottom>
-            Posts List
-          </Typography>
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
+              <Typography variant="display1">
+                Posts List
+              </Typography>
+            </Grid>
+
+            <Grid item>
+              <LinkContainer to={{
+                  pathname: "/post/s/new",
+                  state: {
+                    admin: this.props.admin
+                  },
+                }}
+              >
+                <Button variant="raised" color="primary">New</Button>
+              </LinkContainer>
+            </Grid>
+          </Grid>
 
           <Grid container className={classes.root} spacing={16} justify="center" alignItems="center">
             <Grid item xs={12}>
@@ -177,18 +194,26 @@ class BlogList extends Component {
                       _.isEmpty(blogList)
                         ? (<TableRow></TableRow>)
                         : blogList.map((item, index) => (
-                            <TableRow hover key={index}
-                              onClick={this.handleRowClick(item)}
+                            <LinkContainer to={{
+                                pathname: "/post/s/" + item._id,
+                                hash: '#',
+                                state: {
+                                  "admin": this.props.admin,
+                                }
+                              }} 
+                              key={item._id}
                             >
-                              <TableCell>{index + 1}</TableCell>
-                              <TableCell>{item.authorId.username}</TableCell>
-                              <TableCell>{item.title}</TableCell>
-                              <TableCell>{item.summary}</TableCell>
-                              <TableCell>{item.publishedAt ? ElapsedTime(item.publishedAt): 'Not published'}</TableCell>
-                              <TableCell>{item.status}</TableCell>
-                              <TableCell>{item.state}</TableCell>
-                              <TableCell>{item.reports.length}</TableCell>
-                            </TableRow>
+                              <TableRow hover>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell>{item.authorId.username}</TableCell>
+                                <TableCell>{item.title}</TableCell>
+                                <TableCell>{item.summary}</TableCell>
+                                <TableCell>{item.publishedAt ? ElapsedTime(item.publishedAt): 'Not published'}</TableCell>
+                                <TableCell>{item.status}</TableCell>
+                                <TableCell>{item.state}</TableCell>
+                                <TableCell>{item.reports.length}</TableCell>
+                              </TableRow>
+                            </LinkContainer>
                         ))
                     }
                   </TableBody>

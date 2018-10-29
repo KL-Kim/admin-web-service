@@ -14,6 +14,8 @@ const blogServiceUri = {
   commonUrl: config.API_GATEWAY_ROOT + '/api/v1/post',
   singleCommonUrl: config.API_GATEWAY_ROOT + '/api/v1/post/single/',
   adminCommonUrl: config.API_GATEWAY_ROOT + '/api/v1/post/admin/',
+  imageUrl: config.API_GATEWAY_ROOT + '/api/v1/post/images/',
+  adminUrl: config.API_GATEWAY_ROOT + '/api/v1/post/admin',
 }
 
 /**
@@ -24,15 +26,16 @@ const blogServiceUri = {
  * @property {String} uid - Author user id
  * @property {String} status - Post status
  */
-export const fetchPostsList = ({ skip, limit, search, uid, status } = {}) => {
+export const fetchPostsList = (token, { skip, limit, search, uid, status, state } = {}) => {
   const options = {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      "Authorization": 'Bearer ' + token,
     },
   };
 
-  let url = blogServiceUri.commonUrl + '?';
+  let url = blogServiceUri.adminUrl + '?';
 
   if (skip) {
     url = url + '&skip=' + skip;
@@ -52,6 +55,10 @@ export const fetchPostsList = ({ skip, limit, search, uid, status } = {}) => {
 
   if (status) {
     url = url + '&status=' + status;
+  }
+
+  if (state) {
+    url = url + '&state=' + state;
   }
 
   return fetch(url, options)
@@ -120,6 +127,34 @@ export const addNewPostFetch = (token, { authorId, title, summary, content, keyw
   };
 
   return fetch(blogServiceUri.commonUrl, options)
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        return Promise.reject(responseErrorHandler(response));
+      }
+    })
+    .catch(err => {
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * Upload post images
+ * @param {String} token 
+ * @param {String} id 
+ * @param {Formdata} data 
+ */
+export const uploadPostImagesFetch = (token, id, data) => {
+  const options = {
+    "method": 'POST',
+    "headers": {
+      "Authorization": 'Bearer ' + token,
+    },
+    "body": data,
+  };
+
+  return fetch(blogServiceUri.imageUrl + id, options)
     .then(response => {
       if (response.ok) {
         return response;

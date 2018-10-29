@@ -180,7 +180,7 @@ export const deleteBusinessFetch = (token, id) => {
  * Upload business images
  * @param {String} token - Verification code
  * @param {String} id - Business Id
- * @param {Object} data - Business image
+ * @param {Formdata} data - Business image
  */
 export const uploadImagesFetch = (token, id, data) => {
   const options = {

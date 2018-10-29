@@ -95,6 +95,7 @@ export const loginFetch = (email, password) => {
       } else {
         let error = new Error(response.statusText);
         error.status = response.status;
+        error.statusText = response.statusText;
 
         if (response.status === 401) {
           error.message = "Invalid email or password";

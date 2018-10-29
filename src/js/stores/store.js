@@ -1,15 +1,21 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk';
-import { createLogger } from 'redux-logger';
+
+// Dev Tools 
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+// Production Build
+import { compose } from 'redux';
 
 import reducers from '../reducers';
 
-// Dev
-import DevTools from '../components/utils/DevTools';
-
-const configureState = (preloadedState) => {
-  const loggerMiddleware = createLogger();
-  const store =createStore(reducers, compose(applyMiddleware(thunkMiddleware, loggerMiddleware), DevTools.instrument()));
+const configureState = () => {
+  
+  const store =createStore(
+    reducers, 
+    composeWithDevTools(applyMiddleware(thunkMiddleware))
+    // compose(applyMiddleware(thunkMiddleware))
+  );
 
   if (module.hot) {
     module.hot.accept('../reducers', () => {

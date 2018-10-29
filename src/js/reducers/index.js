@@ -9,6 +9,8 @@ import reviewReducer from './review.reducer';
 import notificationReducer from './notification.reducer';
 import blogReducer from './blog.reducer';
 import commentReducer from './comment.reducer';
+import errorReducer from './error.reducer';
+import searchReducer from './search.reducer';
 
 const reducer = combineReducers({
   userReducer,
@@ -21,6 +23,8 @@ const reducer = combineReducers({
   notificationReducer,
   blogReducer,
   commentReducer,
+  errorReducer,
+  searchReducer,
 });
 
 export default reducer;

@@ -299,7 +299,7 @@ UsersList.propTypes = {
   "admin": PropTypes.object.isRequired,
   "isFetching": PropTypes.bool.isRequired,
   "usersList": PropTypes.array.isRequired,
-  "total": PropTypes.number.isRequired,
+  "totalCount": PropTypes.number.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {

@@ -13,17 +13,20 @@ import HomePage from './components/HomePage';
 import NoMatchPage from './components/404';
 import SigninPage from './components/SigninPage';
 import DashboardPage from './components/DashboardPage';
-import BusinessListPage from './components/BusinessList';
+import BusinessListPage from './components/BusinessListPage';
 import SingleBusinessPage from './components/SingleBusinessPage';
 import BusinessSamplePage from './components/BusinessSamplePage';
-import CategoriesList from './components/CategoriesList';
-import TagsList from './components/TagsList';
-import ReviewsList from './components/ReviewsList';
-import PostsList from './components/PostsList';
-import CommentsList from './components/CommentsList';
-import UsersList from './components/UsersList';
+import CategoriesListPage from './components/CategoriesListPage';
+import TagsListPage from './components/TagsListPage';
+import ReviewsListPage from './components/ReviewsListPage';
+import PostsListPage from './components/PostsListPage';
+import SinglePostPage from './components/SinglePostPage';
+import CommentsListPage from './components/CommentsListPage';
+import UsersListPage from './components/UsersListPage';
 import SingleUserPage from './components/SingleUserPage';
 import NotificationPage from './components/NotificationPage'
+import ErrorsListPage from './components/ErrorsListPage';
+import SearchesListPage from './components/SearchesListPage';
 
 import { loadFromStorage } from './helpers/webStorage';
 import webStorageTypes from './constants/webStorage.types';
@@ -51,13 +54,16 @@ const App = () => {
           <AdminRoute exact path="/business" component={BusinessListPage} />
           <AdminRoute path="/business/s/:slug" component={SingleBusinessPage} />
           <AdminRoute path="/business/sample/:slug" component={BusinessSamplePage} />
-          <AdminRoute path="/category" component={CategoriesList} />
-          <AdminRoute path="/tag" component={TagsList} />
-          <AdminRoute path="/review" component={ReviewsList} />
-          <AdminRoute path="/post" component={PostsList} />
-          <AdminRoute path="/comment" component={CommentsList} />
-          <AdminRoute exact path="/user" component={UsersList} />
+          <AdminRoute path="/category" component={CategoriesListPage} />
+          <AdminRoute path="/tag" component={TagsListPage} />
+          <AdminRoute path="/review" component={ReviewsListPage} />
+          <AdminRoute path="/post/s/:id" component={SinglePostPage} />
+          <AdminRoute path="/post" component={PostsListPage} />
+          <AdminRoute path="/comment" component={CommentsListPage} />
+          <AdminRoute exact path="/user" component={UsersListPage} />
           <AdminRoute path="/user/s/:username" component={SingleUserPage} />
+          <AdminRoute path="/error" component={ErrorsListPage} />
+          <AdminRoute path="/query" component={SearchesListPage} />
 
           {/*  Error Routes */}
           <Route component={NoMatchPage} />

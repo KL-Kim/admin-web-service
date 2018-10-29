@@ -7,7 +7,6 @@ import { withStyles } from '@material-ui/core/styles';
 import Header from './Header';
 import Footer from './Footer';
 import Alert from '../utils/Alert';
-import DevTools from '../utils/DevTools';
 
 // Actions
 import { logout } from '../../actions/user.actions';
@@ -52,7 +51,6 @@ class Container extends Component {
           {this.props.children}
         </main>
         <Footer />
-        <DevTools />
         <Alert />
       </div>
     );
