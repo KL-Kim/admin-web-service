@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 
 // Material UI Component
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -31,8 +31,7 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 
-// Material UI Icons
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Chip from '@material-ui/core/Chip';
 
 // Custom Component
 import SettingContainer from './layout/SettingContainer';
@@ -54,7 +53,7 @@ class BlogList extends Component {
     this.state = {
       "dialogOpen": false,
       "search": '',
-      "rowsPerPage": 10,
+      "rowsPerPage": 20,
       "page": 0,
       "title": '',
       "content": '',
@@ -180,12 +179,10 @@ class BlogList extends Component {
                   <TableHead>
                     <TableRow>
                       <TableCell>Index</TableCell>
-                      <TableCell>Author</TableCell>
                       <TableCell>Title</TableCell>
                       <TableCell>Summary</TableCell>
                       <TableCell>Publish Date</TableCell>
                       <TableCell>Status</TableCell>
-                      <TableCell>State</TableCell>
                       <TableCell>Reports</TableCell>
                     </TableRow>
                   </TableHead>
@@ -205,13 +202,17 @@ class BlogList extends Component {
                             >
                               <TableRow hover>
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>{item.authorId.username}</TableCell>
                                 <TableCell>{item.title}</TableCell>
-                                <TableCell>{item.summary}</TableCell>
+                                <TableCell>{item.summary.substring(0, 50)}...</TableCell>
                                 <TableCell>{item.publishedAt ? ElapsedTime(item.publishedAt): 'Not published'}</TableCell>
                                 <TableCell>{item.status}</TableCell>
-                                <TableCell>{item.state}</TableCell>
-                                <TableCell>{item.reports.length}</TableCell>
+                                <TableCell>
+                                  {
+                                    item.reports.length > 0
+                                      ? <Chip label={item.reports.length} color="secondary" />
+                                      : "None"
+                                  }
+                                </TableCell>
                               </TableRow>
                             </LinkContainer>
                         ))

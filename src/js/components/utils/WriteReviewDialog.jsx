@@ -7,7 +7,7 @@ import Dropzone from 'react-dropzone';
 import Img from 'react-image';
 
 // Material UI Components
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Tooltip from '@material-ui/core/Tooltip';

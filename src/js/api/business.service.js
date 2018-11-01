@@ -45,6 +45,7 @@ export const fetchBusinessList = (token, { skip, limit, filter, search, orderBy 
     if (!!filter.reports) url = url + '&reports=1';
     if (!!filter.list) url = url + '&list=' + filter.list;
     if (!!filter.status) url = url + '&status=' + filter.status;
+    if (!!filter.businessState) url = url + '&businessState=' + filter.businessState;
   }
 
   if (orderBy) {

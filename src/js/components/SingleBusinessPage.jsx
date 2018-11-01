@@ -7,7 +7,7 @@ import Quill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
 // Material UI Components
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -935,10 +935,10 @@ class SingleBusinessPage extends Component {
                       aria-label="businessState"
                       name="businessState"
                       value={this.state.businessState}
-                      onChange={this.handleChange}
+
                     >
                       <FormControlLabel value="NORMAL" control={<Radio />} label="Normal" />
-                      <FormControlLabel value="DISSOLUTE" control={<Radio />} label="Dissolute" />
+                      <FormControlLabel value="CLOSE" control={<Radio />} label="Close down" />
                     </RadioGroup>
                   </FormControl>
                 </Paper>

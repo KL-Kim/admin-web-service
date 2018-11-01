@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 // Material UI Components
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -25,6 +25,7 @@ import Search from '@material-ui/icons/Search';
 
 // Custom Components
 import LinkContainer from '../utils/LinkContainer';
+import { Divider } from '@material-ui/core';
 
 const styles = theme => ({
   "drawerPaper": {
@@ -41,7 +42,6 @@ const styles = theme => ({
 class Sidebar extends Component {
   render() {
     const { classes, user, match } = this.props;
-    const role = _.isEmpty(user) ? '' : user.role;
 
     return (
       <div>
@@ -110,6 +110,8 @@ class Sidebar extends Component {
                   <ListItemText primary="Queries" classes={match.path === "/query" ? { primary: classes.selected } : {}} />
                 </MenuItem>
               </LinkContainer>
+
+              <Divider />
 
               <LinkContainer to={{
                   pathname: "/user",
@@ -185,6 +187,8 @@ class Sidebar extends Component {
                   <ListItemText primary="Reviews" classes={match.path === "/review" ? { primary: classes.selected } : {}} />
                 </MenuItem>
               </LinkContainer>
+
+              <Divider />
 
               <LinkContainer to={{
                   pathname: "/post",

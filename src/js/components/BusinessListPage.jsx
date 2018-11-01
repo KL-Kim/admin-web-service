@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 
 // Material UI Components
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -59,6 +59,7 @@ class BusinessList extends Component {
       "rowsPerPage": 20,
       "page": 0,
       "status": '',
+      "businessState": '',
       "event": false,
       "reports": false,
       "orderBy": 'new',
@@ -81,18 +82,20 @@ class BusinessList extends Component {
   }
 
   handlePaginationChange(e, page) {
-    const { rowsPerPage, status, search, reports, event, orderBy } = this.state;
+    const { rowsPerPage, status, search, reports, event, orderBy, businessState } = this.state;
 
     this.props.getBusinessList({
-      skip: page * rowsPerPage,
+      "skip": page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
         status,
+        businessState,
         event,
         reports,
       },
       search,
       orderBy,
+      
     })
     .then(response => {
       if (response) {
@@ -104,13 +107,14 @@ class BusinessList extends Component {
   }
 
   handleChangeRowsPerPage(e) {
-    const { page, status, search, reports, event, orderBy } = this.state;
+    const { page, status, search, reports, event, orderBy, businessState } = this.state;
 
     this.props.getBusinessList({
       skip: page * e.target.value,
-      limit: e.target.value,
+      "limit": e.target.value,
       filter: {
         status,
+        businessState,
         event,
         reports,
       },
@@ -135,16 +139,17 @@ class BusinessList extends Component {
   }
 
   handleEventSwitch(e) {
-    const { page, rowsPerPage, status, search, reports, orderBy } = this.state;
+    const { page, rowsPerPage, status, search, reports, orderBy, businessState } = this.state;
     const checked = e.target.checked;
 
     this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-      status,
-      "event": checked,
-      reports,
+        status,
+        businessState,
+        "event": checked,
+        reports,
       },
       search,
       orderBy,
@@ -159,7 +164,7 @@ class BusinessList extends Component {
   }
 
   handleReportSwitch(e) {
-    const { page, rowsPerPage, status, search, event, orderBy } = this.state;
+    const { page, rowsPerPage, status, search, event, orderBy, businessState } = this.state;
     const checked = e.target.checked;
 
     this.props.getBusinessList({
@@ -167,8 +172,9 @@ class BusinessList extends Component {
       limit: rowsPerPage,
       filter: {
         status,
+        businessState,
         event,
-        reports: checked
+        "reports": checked
       },
       search,
       orderBy,
@@ -184,13 +190,14 @@ class BusinessList extends Component {
 
   hanldeChangeStatus(e) {
     const { value } = e.target;
-    const { page, rowsPerPage, event, reports, search, orderBy } = this.state
+    const { page, rowsPerPage, event, reports, search, orderBy, businessState } = this.state;
 
     this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
-        status: value,
+        "status": value,
+        businessState,
         event,
         reports,
       },
@@ -201,7 +208,31 @@ class BusinessList extends Component {
       if (response) {
         this.setState({
           status: value,
-          event: event,
+        });
+      }
+    });
+  }
+
+  handleChangeBusinessState = e => {
+    const { value } = e.target;
+    const { page, rowsPerPage, event, reports, search, orderBy, status } = this.state;
+
+    this.props.getBusinessList({
+      skip: page * rowsPerPage,
+      limit: rowsPerPage,
+      filter: {
+        status,
+        event,
+        reports,
+        "businessState": value,
+      },
+      search,
+      orderBy,
+    })
+    .then(response => {
+      if (response) {
+        this.setState({
+          businessState: value,
         });
       }
     });
@@ -209,13 +240,14 @@ class BusinessList extends Component {
 
   handleSearch(e) {
     e.preventDefault();
-    const { page, rowsPerPage, status, reports, event, search, orderBy } = this.state;
+    const { page, rowsPerPage, status, reports, event, search, orderBy, businessState } = this.state;
 
     this.props.getBusinessList({
       skip: page * rowsPerPage,
       limit: rowsPerPage,
       filter: {
         status,
+        businessState,
         event,
         reports
       },
@@ -230,12 +262,31 @@ class BusinessList extends Component {
     return (
       <SettingContainer>
         <div>
-          <Typography variant="display1" gutterBottom>
-            Business List
-          </Typography>
+          <Grid container className={classes.container} justify="space-between">
+            <Grid item>
+              <Typography variant="display1" gutterBottom>
+                Business List
+              </Typography>
+            </Grid>
 
-          <Grid container spacing={16} className={classes.container}>
-            <Grid item xs={3}>
+             <Grid item>
+              <div className={classes.buttonContainer}>
+                <LinkContainer to={{
+                    pathname: "/business/s/new",
+                    hash: '#',
+                    state: {
+                      "admin": admin,
+                    }
+                  }}
+                >
+                  <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNew}>
+                    Add New
+                  </Button>
+                </LinkContainer>
+              </div>
+            </Grid>
+
+            <Grid item xs={12}>
               <form onSubmit={this.handleSearch}>
                 <FormControl fullWidth>
                   <InputLabel htmlFor="search">Search</InputLabel>
@@ -260,7 +311,9 @@ class BusinessList extends Component {
             </Grid>
           </Grid>
 
-          <Grid container>
+          <br />
+
+          <Grid container alignItems="center">
             <Grid item xs={4}>
               <FormControl fullWidth >
                 <FormLabel component="label">Status</FormLabel>
@@ -272,9 +325,26 @@ class BusinessList extends Component {
                   onChange={this.hanldeChangeStatus}
                 >
                   <FormControlLabel value="" control={<Radio />} label="All" />
-                  <FormControlLabel value="PUBLISHED" control={<Radio />} label="Published" />
                   <FormControlLabel value="DRAFT" control={<Radio />} label="Draft" />
+                  <FormControlLabel value="PUBLISHED" control={<Radio />} label="Published" />
                   <FormControlLabel value="TRASH" control={<Radio />} label="Trash" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={4}>
+              <FormControl fullWidth >
+                <FormLabel component="label">Business State</FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="State"
+                  name="state"
+                  value={this.state.businessState}
+                  onChange={this.handleChangeBusinessState}
+                >
+                  <FormControlLabel value="" control={<Radio />} label="All" />
+                  <FormControlLabel value="NORMAL" control={<Radio />} label="Normal" />
+                  <FormControlLabel value="CLOSE" control={<Radio />} label="Close down" />
                 </RadioGroup>
               </FormControl>
             </Grid>
@@ -302,24 +372,9 @@ class BusinessList extends Component {
                   />
               </FormControl>
             </Grid>
-
-            <Grid item xs={4}>
-              <div className={classes.buttonContainer}>
-                <LinkContainer to={{
-                    pathname: "/business/s/new",
-                    hash: '#',
-                    state: {
-                      "admin": admin,
-                    }
-                  }}
-                >
-                  <Button variant="raised" color="primary" aria-label="add" size="large" onClick={this.handleAddNew}>
-                    Add New
-                  </Button>
-                </LinkContainer>
-              </div>
-            </Grid>
           </Grid>
+          
+          <br />
 
           <Paper>
             <Table className={classes.table}>
@@ -331,43 +386,46 @@ class BusinessList extends Component {
                   <TableCell>Category</TableCell>
                   <TableCell>Views Count</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>State</TableCell>
                   <TableCell>Priority</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {
-                  _.isEmpty(businessList) ? (<TableRow></TableRow>)
-                  : businessList.map((business, index) => (
-                    <LinkContainer to={{
-                        pathname: "/business/s/" + business.enName,
-                        hash: '#',
-                        state: {
-                          "admin": admin,
-                          "businessId": business._id
-                        }
-                      }} key={index}
-                    >
-                      <TableRow hover >
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>
-                          {
-                            (business.reports.length > 0)
-                              ? <Badge color="secondary" badgeContent={business.reports.length}>
-                                  <Typography variant="body1" className={classes.title}>
-                                    {business.cnName}
-                                  </Typography>
-                                </Badge>
-                              : business.cnName
-                          }
-                        </TableCell>
-                        <TableCell>{business.krName}</TableCell>
-                        <TableCell>{_.isEmpty(business.category) ? '' : business.category.krName}</TableCell>
-                        <TableCell>{business.viewsCount}</TableCell>
-                        <TableCell>{business.status}</TableCell>
-                        <TableCell>{business.priority}</TableCell>
-                      </TableRow>
-                    </LinkContainer>
-                  ))
+                  _.isEmpty(businessList) 
+                    ? (<TableRow></TableRow>)
+                    : businessList.map((business, index) => (
+                        <LinkContainer to={{
+                            pathname: "/business/s/" + business.enName,
+                            hash: '#',
+                            state: {
+                              "admin": admin,
+                              "businessId": business._id
+                            }
+                          }} key={index}
+                        >
+                          <TableRow hover >
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>
+                              {
+                                (business.reports.length > 0)
+                                  ? <Badge color="secondary" badgeContent={business.reports.length}>
+                                      <Typography variant="body1" className={classes.title}>
+                                        {business.cnName}
+                                      </Typography>
+                                    </Badge>
+                                  : business.cnName
+                              }
+                            </TableCell>
+                            <TableCell>{business.krName}</TableCell>
+                            <TableCell>{_.isEmpty(business.category) ? '' : business.category.krName}</TableCell>
+                            <TableCell>{business.viewsCount}</TableCell>
+                            <TableCell>{business.status}</TableCell>
+                            <TableCell>{business.businessState}</TableCell>
+                            <TableCell>{business.priority}</TableCell>
+                          </TableRow>
+                        </LinkContainer>
+                    ))
                 }
               </TableBody>
               <TableFooter>

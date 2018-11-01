@@ -85,7 +85,7 @@ export const loginFetch = (email, password) => {
       'Content-Type': 'application/json',
     },
     "credentials": 'include',
-    "body": JSON.stringify({ email, password }),
+    "body": JSON.stringify({ email, password, admin: true }),
   };
 
   return fetch(authServiceUri.loginUrl, options)
@@ -97,11 +97,12 @@ export const loginFetch = (email, password) => {
         error.status = response.status;
         error.statusText = response.statusText;
 
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           error.message = "Invalid email or password";
           const loginFailedCount = loadFromStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED);
           saveToStorage(webStorageTypes.WEB_STORAGE_LOGIN_FAILED, loginFailedCount + 1);
-        } else {
+        }
+        else {
           error.message = "Unknown Server Error";
         }
 

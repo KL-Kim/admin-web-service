@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 
 // Material UI Component
-import { withStyles } from '@material-ui/core/styles';
+import withStyles from '@material-ui/core/styles/withStyles';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
@@ -19,6 +19,15 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Dashboard from '@material-ui/icons/Dashboard';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import Notifications from '@material-ui/icons/Notifications';
+import RateReview from '@material-ui/icons/RateReview';
+import Book from '@material-ui/icons/Book';
+import QuestionAnswer from '@material-ui/icons/QuestionAnswer';
+import Group from '@material-ui/icons/Group';
+import Business from '@material-ui/icons/Business';
+import Restaurant from '@material-ui/icons/Restaurant';
+import Loyalty from '@material-ui/icons/Loyalty';
+import Error from '@material-ui/icons/Error';
+import Search from '@material-ui/icons/Search';
 
 // Custom Components
 import LinkContainer from '../utils/LinkContainer';
@@ -186,8 +195,9 @@ class Header extends Component {
                 classes={{paper: classes.drawerPaper}}
               >
                 <div className={classes.account}>
-                  <Avatar user={user} type="MEDIUM" updatedAt={updatedAt} />
-                  <Typography variant="body1" className={classes.name}><ProperName user={user} /></Typography>
+                  <Typography variant="body1" className={classes.name}>
+                    <ProperName user={user} />
+                  </Typography>
                 </div>
 
                 <Divider />
@@ -211,7 +221,7 @@ class Header extends Component {
                   <LinkContainer to={{
                       pathname: "/notification",
                       state: {
-                        user
+                        admin: user
                       },
                     }}
                   >
@@ -222,6 +232,145 @@ class Header extends Component {
                       <ListItemText primary="Notification" />
                     </MenuItem>
                   </LinkContainer>
+
+                  <LinkContainer to={{
+                  pathname: "/error",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem >
+                  <ListItemIcon>
+                    <Error />
+                  </ListItemIcon>
+                  <ListItemText primary="Errors" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/query",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem >
+                  <ListItemIcon>
+                    <Search />
+                  </ListItemIcon>
+                  <ListItemText primary="Queries" />
+                </MenuItem>
+              </LinkContainer>
+
+              <Divider />
+
+              <LinkContainer to={{
+                  pathname: "/user",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem >
+                  <ListItemIcon>
+                    <Group />
+                  </ListItemIcon>
+                  <ListItemText primary="Users" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/business",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem >
+                  <ListItemIcon>
+                    <Business />
+                  </ListItemIcon>
+                  <ListItemText primary="Business" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/category",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem>
+                  <ListItemIcon>
+                    <Restaurant />
+                  </ListItemIcon>
+                  <ListItemText primary="Category" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/tag",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem>
+                  <ListItemIcon>
+                    <Loyalty />
+                  </ListItemIcon>
+                  <ListItemText primary="Tag" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/review",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem>
+                  <ListItemIcon>
+                    <RateReview />
+                  </ListItemIcon>
+                  <ListItemText primary="Reviews" />
+                </MenuItem>
+              </LinkContainer>
+
+              <Divider />
+
+              <LinkContainer to={{
+                  pathname: "/post",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem>
+                  <ListItemIcon>
+                    <Book />
+                  </ListItemIcon>
+                  <ListItemText primary="Posts" />
+                </MenuItem>
+              </LinkContainer>
+
+              <LinkContainer to={{
+                  pathname: "/comment",
+                  state: {
+                    admin: user
+                  },
+                }}
+              >
+                <MenuItem>
+                  <ListItemIcon>
+                    <QuestionAnswer />
+                  </ListItemIcon>
+                  <ListItemText primary="Comments" />
+                </MenuItem>
+              </LinkContainer>
 
                   <Divider />
 
